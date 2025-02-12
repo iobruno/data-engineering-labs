@@ -6,14 +6,28 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 
 dependencies = [
-    "sqlalchemy>=1.4.54,<2.0",                         # Airflow doesn't yet support SQLAlchemy 2.x
-    "psycopg2-binary==2.9.10",                         # psycopg3 is only supported by SQLAlchemy 2.0+
+    "pandas>=2.1.0,<2.2.0",
+    "polars>=1.22.0,<2.0",
+    "pyarrow>=19.0,<20.0",
+    "psycopg[binary]>=3.2.4,<4.0",
+    "adbc-driver-manager>=1.4.0,<2.0",
+    "adbc-driver-postgresql>=1.4.0,<2.0",
+    "loguru>=0.7.3,<1.0",
 ]
 
 [project.optional-dependencies]
+core = [
+    "apache-airflow[virtualenv]>=2.10,<2.11",           # Required for PythonVirtualenvOperator
+    "cloudpickle>=3.1.1,<4.0",                          # Required for PythonVirtualenvOperator
+    "psycopg2-binary>=2.9,<3.0",                        # psycopg3 requires SQLAlchemy 2.0+
+    "sqlalchemy>=1.4,<2.0",                             # Airflow 2.10 doesn't yet support SQLAlchemy 2.0+
+]
 celery = [
-    "apache-airflow-providers-celery>=3.10.0,<4.0",    # required for CeleryExecutor
-    "apache-airflow-providers-redis>=3.8.0,<4.0",      # required for CeleryExecutor
+    "apache-airflow-providers-celery>=3.10.0,<4.0",     # required for CeleryExecutor
+    "apache-airflow-providers-redis>=3.8.0,<4.0",       # required for CeleryExecutor
+]
+gcp = [
+    "apache-airflow-providers-google>=12.0,<13.0",
 ]
 
 [dependency-groups]
