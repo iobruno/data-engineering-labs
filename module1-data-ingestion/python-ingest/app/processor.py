@@ -1,37 +1,29 @@
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Type
 
 from rich.progress import BarColumn, Progress, TaskID, TextColumn, TimeElapsedColumn
 
-from app.df_fetcher import PandasFetcher, PolarsFetcher
-from app.df_repository import SQLRepo
+from app.df_fetcher import DataframeFetcher, PandasFetcher, PolarsFetcher
+from app.df_repository import FhvRepo, GreenTaxiRepo, SQLRepo, YellowTaxiRepo, ZoneLookupRepo
 from app.schemas import FhvSchema, GreenTaxiSchema, Schema, YellowTaxiSchema, ZoneLookupSchema
 
 progress = Progress(
     TextColumn("[bold blue]{task.description}"),
     BarColumn(),
-    "Chunk: {task.completed}/{task.total}",
-    "•",
-    "[progress.percentage]{task.percentage:>3.1f}%",
-    "•",
+    "Chunk: {task.completed}/{task.total} •",
+    "[progress.percentage]{task.percentage:>3.1f}% •",
     TimeElapsedColumn(),
 )
 
 
 class Processor(metaclass=ABCMeta):
-    def __init__(self, polars_ff: bool = False):
-        if polars_ff:
-            fetcher = PolarsFetcher().with_schema(self.schema.polars)
-        else:
-            fetcher = PandasFetcher().with_schema(self.schema.pyarrow)
-
-        self.use_polars = polars_ff
-        self.fetcher = fetcher.with_renaming_strategy(self.schema.rename_to)
+    def __init__(self, fetcher: DataframeFetcher, conn_str: str):
+        self.repo = self.repo(conn_str)
+        self.fetcher = fetcher
 
     def extract_and_load_with(
         self,
-        repo: SQLRepo,
         endpoints: list[str],
         write_disposition: Literal["replace", "append"],
         tasks: list[TaskID],
@@ -39,35 +31,30 @@ class Processor(metaclass=ABCMeta):
         if not endpoints:
             return
 
-        endpoint, *remain_endpoints = endpoints
         tid, *remain_tasks = tasks
+        endpoint, *remain_endpoints = endpoints
 
-        record = self.fetcher.fetch(endpoint)
-        df_slice, *other_slices = record.slices
-        completeness, total_parts = 1, len(record.slices)
+        df = self.fetcher.fetch_csv(endpoint, schema=self._fetch_schema())
+        slices = self.fetcher.slice_in_chunks(df)
+        chunk, *remain_chunks = slices
+        completeness, total_parts = 1, len(slices)
 
         progress.update(task_id=tid, completed=0, total=total_parts)
         progress.start_task(task_id=tid)
 
-        # This is required since, in 'append' mode, polars.df does not create
-        # the table if it doesn't exist. It also guarantees idempotency
-        repo.save(df_slice, write_disposition=write_disposition)
+        # Required since polars.df doesn't create the table in 'append' mode if it doesn't exist
+        self.repo.save(chunk, write_disposition)
         progress.update(task_id=tid, completed=completeness, total=total_parts)
 
-        for _ in repo.save_all(other_slices):
+        for _ in self.repo.save_all(remain_chunks):
             completeness += 1
             progress.update(task_id=tid, completed=completeness, total=total_parts)
 
-        self.extract_and_load_with(repo, remain_endpoints, "append", remain_tasks)
+        self.extract_and_load_with(remain_endpoints, "append", remain_tasks)
 
-    def run(self, endpoints, repo, write_disposition):
+    def run(self, endpoints: list[str]):
         tasks = self.gen_progress_tasks_for(endpoints)
-        self.extract_and_load_with(repo, endpoints, write_disposition, tasks)
-
-    @property
-    @abstractmethod
-    def schema(self) -> Schema:
-        raise NotImplementedError()
+        self.extract_and_load_with(endpoints, "replace", tasks)
 
     @classmethod
     def gen_progress_tasks_for(cls, endpoints: list[str]) -> list[TaskID]:
@@ -77,26 +64,49 @@ class Processor(metaclass=ABCMeta):
             for name in filenames
         ]
 
+    def _fetch_schema(self) -> dict:
+        if isinstance(self.fetcher, PolarsFetcher):
+            return self.schema().polars()
+        elif isinstance(self.fetcher, PandasFetcher):
+            return self.schema().pyarrow()
+        raise NotImplementedError()
+
+    @abstractmethod
+    def schema(self) -> Schema:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def repo(self, conn_str: str) -> SQLRepo:
+        raise NotImplementedError()
+
 
 class GreenTaxiProcessor(Processor):
-    @property
-    def schema(self) -> Schema:
-        return GreenTaxiSchema()
+    def schema(self) -> Type[GreenTaxiSchema]:
+        return GreenTaxiSchema
+
+    def repo(self, conn_str: str) -> SQLRepo:
+        return GreenTaxiRepo(conn_str)
 
 
 class YellowTaxiProcessor(Processor):
-    @property
-    def schema(self) -> Schema:
-        return YellowTaxiSchema()
+    def schema(self) -> Type[Schema]:
+        return YellowTaxiSchema
+
+    def repo(self, conn_str: str) -> SQLRepo:
+        return YellowTaxiRepo(conn_str)
 
 
 class FhvProcessor(Processor):
-    @property
-    def schema(self) -> Schema:
-        return FhvSchema()
+    def schema(self) -> Type[Schema]:
+        return FhvSchema
+
+    def repo(self, conn_str) -> SQLRepo:
+        return FhvRepo(conn_str)
 
 
 class ZoneLookupProcessor(Processor):
-    @property
-    def schema(self) -> Schema:
-        return ZoneLookupSchema()
+    def schema(self) -> Type[Schema]:
+        return ZoneLookupSchema
+
+    def repo(self, conn_str) -> SQLRepo:
+        return ZoneLookupRepo(conn_str)

@@ -5,7 +5,7 @@ from loguru import logger
 from sqlalchemy import create_engine, exc, text
 from typer import BadParameter, Context, Option, Typer
 
-from app.df_repository import FhvTaxiRepo, GreenTaxiRepo, YellowTaxiRepo, ZoneLookupRepo
+from app.df_fetcher import PandasFetcher, PolarsFetcher
 from app.processor import (
     FhvProcessor,
     GreenTaxiProcessor,
@@ -40,12 +40,12 @@ def callback(ctx: Context):
     db_host = getenv("DB_HOST", "localhost")
     db_port = getenv("DB_PORT", 5432)
 
-    conn_string = f"postgresql+psycopg://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
-    adbc_conn_string = f"postgres://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
-
+    adbc_conn_str = f"postgres://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+    conn_str = f"postgresql+psycopg://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
     logger.info("Attempting to connect to Postgresql with env vars...")
-    test_db_conn(conn_string)
-    ctx.obj = {"conn_string": conn_string, "adbc_conn_string": adbc_conn_string}
+
+    test_db_conn(conn_str)
+    ctx.obj = {"conn_string": conn_str, "adbc_conn_string": adbc_conn_str}
 
 
 @cli.command(name="ingest", help="CLI app to extract NYC Trips data and load into Postgres")
@@ -60,34 +60,35 @@ def ingest_db(
     if not any([yellow, green, fhv, zones]):
         raise BadParameter("You must either specify at least one dataset flag (-z | -y | -g | -f)")
 
-    conn_string = ctx.obj.get("adbc_conn_string") if polars_ff else ctx.obj.get("conn_string")
+    if polars_ff:
+        conn_str = ctx.obj.get("adbc_conn_string")
+        fetcher = PolarsFetcher()
+    else:
+        conn_str = ctx.obj.get("conn_string")
+        fetcher = PandasFetcher()
+
     logger.info("Loading datasets...")
     datasets = load_conf()
-    logger.info("Starting dataset processing...")
 
     with progress:
         if green:
             endpoints = datasets.green_trip_data
-            processor = GreenTaxiProcessor(polars_ff=polars_ff)
-            repo = GreenTaxiRepo(conn_string)
-            processor.run(endpoints, repo, "replace")
+            processor = GreenTaxiProcessor(fetcher, conn_str)
+            processor.run(endpoints)
 
         if yellow:
             endpoints = datasets.yellow_trip_data
-            processor = YellowTaxiProcessor(polars_ff=polars_ff)
-            repo = YellowTaxiRepo(conn_string)
-            processor.run(endpoints, repo, "replace")
+            processor = YellowTaxiProcessor(fetcher, conn_str)
+            processor.run(endpoints)
 
         if fhv:
             endpoints = datasets.fhv_trip_data
-            processor = FhvProcessor(polars_ff=polars_ff)
-            repo = FhvTaxiRepo(conn_string)
-            processor.run(endpoints, repo, "replace")
+            processor = FhvProcessor(fetcher, conn_str)
+            processor.run(endpoints)
 
         if zones:
             endpoints = datasets.zone_lookups
-            processor = ZoneLookupProcessor(polars_ff=polars_ff)
-            repo = ZoneLookupRepo(conn_string)
-            processor.run(endpoints, repo, "replace")
+            processor = ZoneLookupProcessor(fetcher, conn_str)
+            processor.run(endpoints)
 
     logger.info("All done!")

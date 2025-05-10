@@ -4,25 +4,25 @@ import polars as pl
 
 
 class Schema(metaclass=ABCMeta):
-    @property
+    @classmethod
     @abstractmethod
-    def polars(self) -> dict:
+    def polars(cls) -> dict:
         raise NotImplementedError()
 
-    @property
+    @classmethod
     @abstractmethod
-    def pyarrow(self) -> dict:
+    def pyarrow(cls) -> dict:
         raise NotImplementedError()
 
-    @property
+    @classmethod
     @abstractmethod
-    def rename_to(self) -> dict:
+    def rename_to(cls) -> dict:
         raise NotImplementedError()
 
 
 class GreenTaxiSchema(Schema):
-    @property
-    def polars(self) -> dict:
+    @classmethod
+    def polars(cls) -> dict:
         return {
             "VendorID": pl.Int32,
             "lpep_pickup_datetime": pl.Datetime,
@@ -46,8 +46,8 @@ class GreenTaxiSchema(Schema):
             "trip_type": pl.Int8,
         }
 
-    @property
-    def pyarrow(self) -> dict:
+    @classmethod
+    def pyarrow(cls) -> dict:
         return {
             "VendorID": "Int64",
             "lpep_pickup_datetime": "datetime64[s]",
@@ -71,8 +71,8 @@ class GreenTaxiSchema(Schema):
             "trip_type": "Int64",
         }
 
-    @property
-    def rename_to(self) -> dict:
+    @classmethod
+    def rename_to(cls) -> dict:
         return {
             "VendorID": "vendor_id",
             "lpep_pickup_datetime": "lpep_pickup_datetime",
@@ -98,8 +98,8 @@ class GreenTaxiSchema(Schema):
 
 
 class YellowTaxiSchema(Schema):
-    @property
-    def polars(self) -> dict:
+    @classmethod
+    def polars(cls) -> dict:
         return {
             "VendorID": pl.Int32,
             "tpep_pickup_datetime": pl.Datetime,
@@ -121,8 +121,8 @@ class YellowTaxiSchema(Schema):
             "congestion_surcharge": pl.Float64,
         }
 
-    @property
-    def pyarrow(self) -> dict:
+    @classmethod
+    def pyarrow(cls) -> dict:
         return {
             "VendorID": "Int64",
             "tpep_pickup_datetime": "datetime64[s]",
@@ -144,8 +144,8 @@ class YellowTaxiSchema(Schema):
             "congestion_surcharge": "float64",
         }
 
-    @property
-    def rename_to(self) -> dict:
+    @classmethod
+    def rename_to(cls) -> dict:
         return {
             "VendorID": "vendor_id",
             "tpep_pickup_datetime": "tpep_pickup_datetime",
@@ -169,8 +169,8 @@ class YellowTaxiSchema(Schema):
 
 
 class FhvSchema(Schema):
-    @property
-    def polars(self) -> dict:
+    @classmethod
+    def polars(cls) -> dict:
         return {
             "dispatching_base_num": pl.String,
             "pickup_datetime": pl.String,
@@ -181,8 +181,8 @@ class FhvSchema(Schema):
             "Affiliated_base_number": pl.String,
         }
 
-    @property
-    def pyarrow(self) -> dict:
+    @classmethod
+    def pyarrow(cls) -> dict:
         return {
             "dispatching_base_num": "string",
             "pickup_datetime": "datetime64[s]",
@@ -193,8 +193,8 @@ class FhvSchema(Schema):
             "Affiliated_base_number": "string",
         }
 
-    @property
-    def rename_to(self) -> dict:
+    @classmethod
+    def rename_to(cls) -> dict:
         return {
             "dispatching_base_num": "dispatching_base_num",
             "pickup_datetime": "pickup_datetime",
@@ -207,8 +207,8 @@ class FhvSchema(Schema):
 
 
 class ZoneLookupSchema(Schema):
-    @property
-    def polars(self) -> dict:
+    @classmethod
+    def polars(cls) -> dict:
         return {
             "LocationID": pl.Int32,
             "Borough": pl.String,
@@ -216,8 +216,8 @@ class ZoneLookupSchema(Schema):
             "service_zone": pl.String,
         }
 
-    @property
-    def pyarrow(self) -> dict:
+    @classmethod
+    def pyarrow(cls) -> dict:
         return {
             "LocationID": "Int64",
             "Borough": "string",
@@ -225,8 +225,8 @@ class ZoneLookupSchema(Schema):
             "service_zone": "string",
         }
 
-    @property
-    def rename_to(self) -> dict:
+    @classmethod
+    def rename_to(cls) -> dict:
         return {
             "LocationID": "location_id",
             "Borough": "borough",

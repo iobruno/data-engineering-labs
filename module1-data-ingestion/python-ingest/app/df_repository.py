@@ -57,7 +57,7 @@ class YellowTaxiRepo(SQLRepo):
         return "yellow_taxi_trips"
 
 
-class FhvTaxiRepo(SQLRepo):
+class FhvRepo(SQLRepo):
     @property
     def tbl_name(self) -> str:
         return "fhv_trips"
