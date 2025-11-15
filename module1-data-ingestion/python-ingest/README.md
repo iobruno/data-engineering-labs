@@ -1,10 +1,11 @@
 # Python ingestion with polars and pandas
 
-![Python](https://img.shields.io/badge/Python-3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
+![Python](https://img.shields.io/badge/Python-3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
 [![Typer](https://img.shields.io/badge/Typer-262A38?style=flat&logo=typer&logoColor=FFFFFF&labelColor=262A38)](https://typer.tiangolo.com/tutorial/)
 [![Polars](https://img.shields.io/badge/polars-24292E?style=flat&logo=polars&logoColor=CC792B&labelColor=24292E)](https://docs.pola.rs/)
 [![Pandas](https://img.shields.io/badge/pandas-150458?style=flat&logo=pandas&logoColor=E70488&labelColor=150458)](https://pandas.pydata.org/docs/user_guide/)
 [![uv](https://img.shields.io/badge/astral/uv-261230?style=flat&logo=uv&logoColor=DE5FE9&labelColor=261230)](https://docs.astral.sh/uv/getting-started/installation/)
+[![Podman](https://img.shields.io/badge/Podman-7845FF?style=flat&logo=podman&logoColor=white&labelColor=7845FF)](https://podman-desktop.io/downloads/)
 [![Docker](https://img.shields.io/badge/Docker-329DEE?style=flat&logo=docker&logoColor=white&labelColor=329DEE)](https://docs.docker.com/get-docker/)
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
@@ -81,9 +82,9 @@ docker run -d --rm \
 
 ## TODO's:
 - [x] PEP-517: Packaging and dependency management with `uv`
-- [x] Code format/lint with Ruff
 - [x] Build a CLI app with `Typer`
 - [x] Progress Bars to keep track of the execution with `rich`
-- [x] Run/Deploy the project on Docker
 - [x] Re-Implement the pipeline with Polars
-- [x] Define DataFrame schemas for Polars to prevent errors
+- [x] Containerize it and run app on `Docker`
+- [x] Fix Dockerfile to add support for `Podman`
+- [x] Code format/lint with `ruff`
