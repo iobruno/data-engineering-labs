@@ -1,4 +1,4 @@
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-17-alpine}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
 
 services:
   ingest-db:
@@ -18,6 +18,22 @@ services:
       timeout: 5s
       retries: 5
     restart: on-failure
+
+  ntlcli:
+    image: iobruno/ntlcli:latest
+    container_name: ntlcli
+    build:
+      dockerfile: ./Dockerfile
+    environment:
+      DB_HOST: 'ingest-db'
+      DB_NAME: 'nyc_taxi'
+      DB_USERNAME: 'postgres'
+      DB_PASSWORD: 'postgres'
+    volumes:
+      - ./datasets.yml:/app/datasets.yml
+    depends_on:
+      ingest-db:
+        condition: service_healthy
 
 volumes:
   vol-ingest-db:
