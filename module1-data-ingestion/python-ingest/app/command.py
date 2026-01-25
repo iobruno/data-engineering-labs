@@ -72,14 +72,16 @@ def ingest_db(
 
     with progress:
         if green:
-            endpoints = datasets.green_trip_data
-            processor = GreenTaxiProcessor(fetcher, conn_str)
-            processor.run(endpoints)
+            endpoints = datasets.green_taxi_trip_data
+            processor = GreenTaxiProcessor(polars_ff=polars_ff)
+            repo = GreenTaxiRepo(conn_string)
+            processor.run(endpoints, repo, "replace")
 
         if yellow:
-            endpoints = datasets.yellow_trip_data
-            processor = YellowTaxiProcessor(fetcher, conn_str)
-            processor.run(endpoints)
+            endpoints = datasets.yellow_taxi_trip_data
+            processor = YellowTaxiProcessor(polars_ff=polars_ff)
+            repo = YellowTaxiRepo(conn_string)
+            processor.run(endpoints, repo, "replace")
 
         if fhv:
             endpoints = datasets.fhv_trip_data
