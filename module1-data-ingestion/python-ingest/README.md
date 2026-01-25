@@ -29,7 +29,12 @@ brew install pre-commit
 pre-commit install
 ```
 
-**3.** Export ENV VARS to connect to DB:
+**3.** Spin-up the nyc-tlc-db:
+```shell
+docker compose up -d tlc-db
+```
+
+**4.** Export ENV VARS to connect to DB:
 ```shell
 export DB_HOST=localhost
 export DB_NAME=nyc_tlc
@@ -37,27 +42,27 @@ export DB_USERNAME=postgres
 export DB_PASSWORD=postgres
 ```
 
-**4.** Run the script with the intended flags or use `--help`:
+**5.** Run the script with the intended flags or use `--help`:
 
-`ntlcli ingest -y` or `--yellow`:
+`tlc ingest -y` or `--yellow`:
 * fetches the datasets under the key `yellow_taxi_trip_data` only
 * persists to Postgres, on table `yellow_taxi_trips`
   
-`ntlcli ingest -g` or `--green`:
+`tlc ingest -g` or `--green`:
 * fetches the datasets under the key `green_taxi_trip_data` only,
 * persists to Postgres, on table `green_taxi_trips`
 
-`ntlcli ingest -f` or `--fhv`:
+`tlc ingest -f` or `--fhv`:
 * fetches the datasets under the key `fhv_trip_data`
 * persists to Postgres, on table: `fhv_trips`
 
-`ntlcli ingest -z` or `--zones`:
+`tlc ingest -z` or `--zones`:
 * fetches the datasets under the key `zone_lookups`
 * persists to Postgres, on table: `zone_lookup`
 
 Additionally, you can use `--use-polars` for a major speed boost with Polars. 
 
-You can use any combination of options above to fetch more than dataset group at a time. For instance: `ntlcli ingest -gz --use-polars` fetches the **NYC GreenTaxi Trip Data** and **NYC Lookup Zones** while **using Polars** as the Dataframe library.
+You can use any combination of options above to fetch more than dataset group at a time. For instance: `tlc ingest -gz --use-polars` fetches the **NYC GreenTaxi Trip Data** and **NYC Lookup Zones** while **using Polars** as the Dataframe library.
 
 
 ## Containerization
