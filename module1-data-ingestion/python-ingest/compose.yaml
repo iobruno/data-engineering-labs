@@ -19,22 +19,6 @@ services:
       retries: 5
     restart: on-failure
 
-  ingest-app:
-    image: iobruno/pyingest:latest
-    container_name: ingest-app
-    build:
-      dockerfile: ./Dockerfile
-    environment:
-      DATABASE_HOST: 'ingest-db'
-      DATABASE_NAME: 'nyc_taxi'
-      DATABASE_USERNAME: 'postgres'
-      DATABASE_PASSWORD: 'postgres'
-    volumes:
-      - ./datasets.yml:/app/datasets.yml
-    depends_on:
-      ingest-db:
-        condition: service_healthy
-
 volumes:
   vol-ingest-db:
     name: vol-ingest-db
