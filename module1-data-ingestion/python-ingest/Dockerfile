@@ -23,4 +23,4 @@ COPY datasets.yaml ./
 ENV PYTHONPATH=/ntlcli \
     PYTHONUNBUFFERED=1
 
-CMD ["ntlcli", "ingest", "-zygf", "--use-polars"]
+CMD ["tlc", "ingest", "-zygf", "--use-polars"]
