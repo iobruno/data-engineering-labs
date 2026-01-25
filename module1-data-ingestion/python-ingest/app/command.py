@@ -55,16 +55,16 @@ def ingest_db(
     green: bool = Option(False, "--green", "-g", help="Fetch Green cab dataset"),
     fhv: bool = Option(False, "--fhv", "-f", help="Fetch FHV cab dataset"),
     zones: bool = Option(False, "--zones", "-z", help="Fetch Zone lookup dataset"),
-    polars_ff: bool = Option(False, "--use-polars", help="Feature flag to use Polars"),
+    use_polars: bool = Option(False, "--use-polars", help="Feature flag to use Polars"),
 ):
     if not any([yellow, green, fhv, zones]):
         raise BadParameter("You must either specify at least one dataset flag (-z | -y | -g | -f)")
 
-    if polars_ff:
-        conn_str = ctx.obj.get("adbc_conn_string")
+    if use_polars:
+        conn_string = ctx.obj.get("adbc_conn_string")
         fetcher = PolarsFetcher()
     else:
-        conn_str = ctx.obj.get("conn_string")
+        conn_string = ctx.obj.get("conn_string")
         fetcher = PandasFetcher()
 
     logger.info("Loading datasets...")
@@ -73,24 +73,22 @@ def ingest_db(
     with progress:
         if green:
             endpoints = datasets.green_taxi_trip_data
-            processor = GreenTaxiProcessor(polars_ff=polars_ff)
-            repo = GreenTaxiRepo(conn_string)
-            processor.run(endpoints, repo, "replace")
+            processor = GreenTaxiProcessor(fetcher, conn_string)
+            processor.run(endpoints)
 
         if yellow:
             endpoints = datasets.yellow_taxi_trip_data
-            processor = YellowTaxiProcessor(polars_ff=polars_ff)
-            repo = YellowTaxiRepo(conn_string)
-            processor.run(endpoints, repo, "replace")
+            processor = YellowTaxiProcessor(fetcher, conn_string)
+            processor.run(endpoints)
 
         if fhv:
             endpoints = datasets.fhv_trip_data
-            processor = FhvProcessor(fetcher, conn_str)
+            processor = FhvProcessor(fetcher, conn_string)
             processor.run(endpoints)
 
         if zones:
             endpoints = datasets.zone_lookups
-            processor = ZoneLookupProcessor(fetcher, conn_str)
+            processor = ZoneLookupProcessor(fetcher, conn_string)
             processor.run(endpoints)
 
     logger.info("All done!")

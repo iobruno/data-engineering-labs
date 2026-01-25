@@ -69,7 +69,7 @@ You can use any combination of options above to fetch more than dataset group at
 
 **1.** Build the Docker Image with:
 ```shell
-docker build -t tlc-cli:latest . --no-cache
+docker build -t iobruno/tlc-cli:latest . --no-cache
 ```
 
 **2.** Start a container with it:
@@ -80,7 +80,7 @@ docker run -d --rm \
   -e DB_NAME=nyc_tlc \
   -e DB_USERNAME=postgres \
   -e DB_PASSWORD=postgres \
-  --name iobruno/tlc-cli \
+  --name tlc-cli \
   iobruno/tlc-cli:latest
 ```
 
