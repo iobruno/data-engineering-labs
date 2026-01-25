@@ -32,7 +32,7 @@ pre-commit install
 **3.** Export ENV VARS to connect to DB:
 ```shell
 export DB_HOST=localhost
-export DB_NAME=nyc_taxi
+export DB_NAME=nyc_tlc
 export DB_USERNAME=postgres
 export DB_PASSWORD=postgres
 ```
@@ -40,16 +40,16 @@ export DB_PASSWORD=postgres
 **4.** Run the script with the intended flags or use `--help`:
 
 `ntlcli ingest -y` or `--yellow`:
-* fetches the datasets under the key `yellow_trip_data` only
-* persists to Postgres, on table `yellow_taxi_data`
+* fetches the datasets under the key `yellow_taxi_trip_data` only
+* persists to Postgres, on table `yellow_taxi_trips`
   
 `ntlcli ingest -g` or `--green`:
-* fetches the datasets under the key `green_trip_data` only,
-* persists to Postgres, on table `green_taxi_data`
+* fetches the datasets under the key `green_taxi_trip_data` only,
+* persists to Postgres, on table `green_taxi_trips`
 
 `ntlcli ingest -f` or `--fhv`:
 * fetches the datasets under the key `fhv_trip_data`
-* persists to Postgres, on table: `fhv_taxi_data`
+* persists to Postgres, on table: `fhv_trips`
 
 `ntlcli ingest -z` or `--zones`:
 * fetches the datasets under the key `zone_lookups`
@@ -64,7 +64,7 @@ You can use any combination of options above to fetch more than dataset group at
 
 **1.** Build the Docker Image with:
 ```shell
-docker build -t iobruno/ntlcli:latest . --no-cache
+docker build -t tlc-cli:latest . --no-cache
 ```
 
 **2.** Start a container with it:
@@ -72,11 +72,11 @@ docker build -t iobruno/ntlcli:latest . --no-cache
 docker run -d --rm \
   -e DB_HOST=host.docker.internal \
   -e DB_PORT=5432 \
-  -e DB_NAME=nyc_taxi \
+  -e DB_NAME=nyc_tlc \
   -e DB_USERNAME=postgres \
   -e DB_PASSWORD=postgres \
-  --name ntlcli \
-  iobruno/ntlcli
+  --name iobruno/tlc-cli \
+  iobruno/tlc-cli:latest
 ```
 
 

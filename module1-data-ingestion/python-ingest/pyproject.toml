@@ -5,8 +5,8 @@ requires = [
 build-backend = "hatchling.build"
 
 [project]
-name = "ntlcli"
-version = "2.1"
+name = "nyc-tlc-cli"
+version = "2.2"
 description = "Headless CLI for processing the NYC TLC Dataset"
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
@@ -31,7 +31,7 @@ dev = [
 ]
 
 [project.scripts]
-ntlcli = "app.command:cli"
+tlc = "app.command:cli"
 
 [tool.hatch.build.targets.wheel]
 include = ["app/**"]
