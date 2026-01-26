@@ -1,5 +1,3 @@
-from os import getenv
-
 import airbyte_api as ab
 import structlog
 from airbyte_api import api, models
@@ -60,15 +58,3 @@ class AirbyteClient:
             ))
         ))
     # fmt: on
-
-
-if __name__ == "__main__":
-    api_url = getenv("AIRBYTE_API_URL", "http://localhost:8000/api/public/v1")
-    client_id = getenv("AIRBYTE_CLIENT_ID")
-    client_secret = getenv("AIRBYTE_CLIENT_SECRET")
-
-    client = AirbyteClient.create(
-        api_url=api_url,
-        client_id=client_id,
-        client_secret=client_secret,
-    )
