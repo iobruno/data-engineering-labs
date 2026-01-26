@@ -13,7 +13,7 @@ Docker Compose support is [officially deprecated and no longer supported](https:
 
 ## Getting started
 
-1. Install abctl tool:
+**1.** Install abctl tool:
 ```shell
 curl -LsfS https://get.airbyte.com | bash -
 ```
@@ -22,7 +22,7 @@ curl -LsfS https://get.airbyte.com | bash -
 abctl local install
 ```
 
-2. Get your credentials with:
+**2.** Get your credentials with:
 ```shell
 abctl local credentials
 ```
@@ -40,9 +40,15 @@ open http://localhost:8000
 uv sync && source .venv/bin/activate
 ```
 
-**2.** Spin-up Jupyter notebook to play around or check the [demo scripts](./scripts/) 
+**2.** Set the env vars `AIRBYTE_CLIENT_ID` and `AIRBYTE_CLIENT_SECRET` w/ respective values from `abctl local credentials`
 ```shell
-jupyterlab
+export AIRBYTE_CLIENT_ID=
+export AIRBYTE_CLIENT_SECRET=
+```
+
+**3.** Spin-up Jupyter notebook to play around or check the [demo scripts](./scripts/) 
+```shell
+jupyter lab
 ```
 
 
