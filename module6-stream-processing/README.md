@@ -9,7 +9,6 @@ This submodule focuses on various approaches for stream processing, such as:
 
 - [Kotlin](kotlin/): Producing and Consuming messages from/to Kafka with Kotlin/Java
 - [ksqlDB](ksqldb/): Stream Processing with ksqlDB (Kafka Streams)
-- [RisingWave](risingwave/): Stream Processing with RisingWave
 
 
 ## Getting Started
