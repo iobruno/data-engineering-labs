@@ -58,6 +58,6 @@ jupyter lab
 
 ## TODO
 - [x] Spin-up Airbyte with [abctl](https://github.com/airbytehq/abctl)
-- [ ] Get familiar with [Airbyte API Python SDK](https://github.com/airbytehq/airbyte-api-python-sdk)
+- [x] Get familiar with [Airbyte API Python SDK](https://github.com/airbytehq/airbyte-api-python-sdk)
 - [ ] Configure Source/Destinations/Connections with [Airbyte Terraform provider](https://docs.airbyte.com/platform/1.8/terraform-documentation)
 - [ ] Create a Custom Source Connector using [Python CDK](https://docs.airbyte.com/platform/connector-development/cdk-python/)

@@ -11,6 +11,7 @@
 ### [Module 1: Data ingestion](module1-data-ingestion/)
 * [Python ingestion with polars and pandas](module1-data-ingestion/python-ingest/)
 * Rust data ingestion
+* [ELT Ingestion with Airbyte](module1-data-ingestion/airbyte/)
 * [data load tool (dlt)](module1-data-ingestion/data-load-tool/)
 * [IaC with Terraform (Google Cloud Platform)](infrastructure/terraform-gcp/)
 * Homework
