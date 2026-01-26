@@ -1,0 +1,32 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer ********
+      Connection:
+      - keep-alive
+      user-agent:
+      - speakeasy-sdk/python 0.53.0 2.536.0 1.0.0 airbyte-api
+    method: GET
+    uri: http://localhost:8000/api/public/v1/sources/invalid-id?includeSecretCoordinates=false
+  response:
+    body:
+      string: '{"message":"Internal Server Error: Invalid UUID string: invalid-id","exceptionClassName":"java.lang.IllegalArgumentException","exceptionStack":[],"rootCauseExceptionStack":[]}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '175'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 26 Jan 2026 08:47:58 GMT
+    status:
+      code: 500
+      message: Internal Server Error
+version: 1

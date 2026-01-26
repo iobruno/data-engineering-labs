@@ -1,0 +1,29 @@
+[project]
+name = "airbyte-sdk-cdk-labs"
+version = "0.1.0"
+description = "Airbyte Python SDK/CDK Labs"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+
+dependencies = [
+    "airbyte-cdk>=7.6.5,<8.0",  # Python CDK for building Custom connectors
+    "airbyte-api>=0.53.0,<1.0", # Python SDK for interacting w/ API
+    "structlog>=25.5.0,<26.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.14",
+    "jupyterlab>=4.5.3",
+    "pytest>=8.0.0",
+    "vcrpy>=6.0.0",
+]
+
+[tool.ruff]
+line-length = 100
+lint.select = ["F", "E", "W", "I001"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"

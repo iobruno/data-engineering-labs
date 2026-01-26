@@ -1,0 +1,70 @@
+interactions:
+- request:
+    body: grant_type=client_credentials&client_id=********&client_secret=********
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '123'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.32.5
+    method: POST
+    uri: http://localhost:8000/api/public/v1/applications/token
+  response:
+    body:
+      string: '{"access_token":"eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJhdWQiOiJhaXJieXRlLXNlcnZlciIsInN1YiI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMCIsImV4cCI6MTc2OTQxODE3OCwicm9sZXMiOlsiQVVUSEVOVElDQVRFRF9VU0VSIiwiUkVBREVSIiwiRURJVE9SIiwiQURNSU4iLCJPUkdBTklaQVRJT05fTUVNQkVSIiwiT1JHQU5JWkFUSU9OX1JFQURFUiIsIk9SR0FOSVpBVElPTl9SVU5ORVIiLCJPUkdBTklaQVRJT05fRURJVE9SIiwiT1JHQU5JWkFUSU9OX0FETUlOIiwiV09SS1NQQUNFX1JFQURFUiIsIldPUktTUEFDRV9SVU5ORVIiLCJXT1JLU1BBQ0VfRURJVE9SIiwiV09SS1NQQUNFX0FETUlOIiwiREFUQVBMQU5FIl19.yWkPW1_6hsMOPNNrK8ZCubJWM3CvRGNJczcbNvoNv8I","token_type":"Bearer","expires_in":900}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '615'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 26 Jan 2026 08:47:58 GMT
+    status:
+      code: 200
+      message: Ok
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer ********
+      Connection:
+      - keep-alive
+      user-agent:
+      - speakeasy-sdk/python 0.53.0 2.536.0 1.0.0 airbyte-api
+    method: GET
+    uri: http://localhost:8000/api/public/v1/connections?includeDeleted=false&limit=10&offset=0
+  response:
+    body:
+      string: "{\"data\":[{\"connectionId\":\"b7715560-ec4e-44e8-8d64-830f6463e341\",\"name\":\"hackernews-rss-newest
+        \u2192 bigquery-hackernews\",\"sourceId\":\"d73fb160-9fbd-457e-891e-22d5ac5b5aee\",\"destinationId\":\"14e21b21-85d5-46b8-916a-df3c087ac4fe\",\"workspaceId\":\"1a45e743-3de4-4652-adae-e5b2515668f5\",\"status\":\"active\",\"schedule\":{\"scheduleType\":\"manual\"},\"configurations\":{\"streams\":[{\"name\":\"items\",\"syncMode\":\"incremental_deduped_history\",\"cursorField\":[\"published\"],\"primaryKey\":[[\"guid\"]],\"includeFiles\":false,\"selectedFields\":[],\"mappers\":[]}]},\"createdAt\":1768460945,\"tags\":[],\"nonBreakingSchemaUpdatesBehavior\":\"propagate_columns\",\"namespaceDefinition\":\"destination\",\"prefix\":\"newest_\"},{\"connectionId\":\"2795ee18-1960-4d50-a428-0b341f9d6061\",\"name\":\"hackernews-rss-newcomments
+        \u2192 bigquery-hackernews\",\"sourceId\":\"fd5b59d6-438f-4887-b842-28dd5c588a96\",\"destinationId\":\"14e21b21-85d5-46b8-916a-df3c087ac4fe\",\"workspaceId\":\"1a45e743-3de4-4652-adae-e5b2515668f5\",\"status\":\"active\",\"schedule\":{\"scheduleType\":\"manual\"},\"configurations\":{\"streams\":[{\"name\":\"items\",\"syncMode\":\"incremental_deduped_history\",\"cursorField\":[\"published\"],\"primaryKey\":[[\"guid\"]],\"includeFiles\":false,\"selectedFields\":[],\"mappers\":[]}]},\"createdAt\":1768460954,\"tags\":[],\"nonBreakingSchemaUpdatesBehavior\":\"propagate_columns\",\"namespaceDefinition\":\"destination\",\"prefix\":\"comments_\"},{\"connectionId\":\"b624b9ce-fde4-47c1-b9a2-30f9a3bcd870\",\"name\":\"hackernews-rss-jobs
+        \u2192 bigquery-hackernews\",\"sourceId\":\"6589db58-c2cd-4ba7-bf04-5db2845d7628\",\"destinationId\":\"14e21b21-85d5-46b8-916a-df3c087ac4fe\",\"workspaceId\":\"1a45e743-3de4-4652-adae-e5b2515668f5\",\"status\":\"active\",\"schedule\":{\"scheduleType\":\"manual\"},\"configurations\":{\"streams\":[{\"name\":\"items\",\"syncMode\":\"full_refresh_overwrite\",\"cursorField\":[\"published\"],\"primaryKey\":[[\"guid\"]],\"includeFiles\":false,\"selectedFields\":[],\"mappers\":[]}]},\"createdAt\":1768463857,\"tags\":[],\"nonBreakingSchemaUpdatesBehavior\":\"propagate_columns\",\"namespaceDefinition\":\"destination\",\"prefix\":\"jobs_\"},{\"connectionId\":\"ab7e2779-12a8-4669-9431-ff0641dd35b7\",\"name\":\"hackernews-rss-frontpage
+        \u2192 bigquery-hackernews\",\"sourceId\":\"337b4a8e-8de6-43f5-af2a-18b4300d852c\",\"destinationId\":\"14e21b21-85d5-46b8-916a-df3c087ac4fe\",\"workspaceId\":\"1a45e743-3de4-4652-adae-e5b2515668f5\",\"status\":\"active\",\"schedule\":{\"scheduleType\":\"manual\"},\"configurations\":{\"streams\":[{\"name\":\"items\",\"syncMode\":\"incremental_deduped_history\",\"cursorField\":[\"published\"],\"primaryKey\":[[\"guid\"]],\"includeFiles\":false,\"selectedFields\":[],\"mappers\":[]}]},\"createdAt\":1768460942,\"tags\":[],\"nonBreakingSchemaUpdatesBehavior\":\"propagate_columns\",\"namespaceDefinition\":\"destination\",\"prefix\":\"front_\"}],\"previous\":\"\",\"next\":\"http://localhost:8001/api/public/v1/connections?includeDeleted=false&limit=10&offset=10\"}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '783'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 26 Jan 2026 08:47:58 GMT
+      content-encoding:
+      - gzip
+    status:
+      code: 200
+      message: Ok
+version: 1

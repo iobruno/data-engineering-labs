@@ -1,0 +1,33 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer ********
+      Connection:
+      - keep-alive
+      user-agent:
+      - speakeasy-sdk/python 0.53.0 2.536.0 1.0.0 airbyte-api
+    method: GET
+    uri: http://localhost:8000/api/public/v1/destinations/14e21b21-85d5-46b8-916a-df3c087ac4fe?includeSecretCoordinates=false
+  response:
+    body:
+      string: '{"destinationId":"14e21b21-85d5-46b8-916a-df3c087ac4fe","name":"bigquery-hackernews","destinationType":"bigquery","definitionId":"22f6c74f-5699-40ff-833c-4a879ea40133","workspaceId":"1a45e743-3de4-4652-adae-e5b2515668f5","configuration":{"dataset_id":"hackernews_raw_data","project_id":"iobruno-gcp-labs","loading_method":{"method":"Standard"},"credentials_json":"**********","dataset_location":"us-central1","cdc_deletion_mode":"Hard
+        delete","disable_type_dedupe":false},"createdAt":1768458307}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '495'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 26 Jan 2026 08:47:58 GMT
+    status:
+      code: 200
+      message: Ok
+version: 1
