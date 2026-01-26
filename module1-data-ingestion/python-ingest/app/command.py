@@ -61,10 +61,10 @@ def ingest_db(
         raise BadParameter("You must either specify at least one dataset flag (-z | -y | -g | -f)")
 
     if use_polars:
-        conn_string = ctx.obj.get("adbc_conn_string")
+        conn_str = ctx.obj.get("adbc_conn_string")
         fetcher = PolarsFetcher()
     else:
-        conn_string = ctx.obj.get("conn_string")
+        conn_str = ctx.obj.get("conn_string")
         fetcher = PandasFetcher()
 
     logger.info("Loading datasets...")
@@ -73,22 +73,22 @@ def ingest_db(
     with progress:
         if green:
             endpoints = datasets.green_taxi_trip_data
-            processor = GreenTaxiProcessor(fetcher, conn_string)
+            processor = GreenTaxiProcessor(fetcher, conn_str)
             processor.run(endpoints)
 
         if yellow:
             endpoints = datasets.yellow_taxi_trip_data
-            processor = YellowTaxiProcessor(fetcher, conn_string)
+            processor = YellowTaxiProcessor(fetcher, conn_str)
             processor.run(endpoints)
 
         if fhv:
             endpoints = datasets.fhv_trip_data
-            processor = FhvProcessor(fetcher, conn_string)
+            processor = FhvProcessor(fetcher, conn_str)
             processor.run(endpoints)
 
         if zones:
             endpoints = datasets.zone_lookups
-            processor = ZoneLookupProcessor(fetcher, conn_string)
+            processor = ZoneLookupProcessor(fetcher, conn_str)
             processor.run(endpoints)
 
     logger.info("All done!")
