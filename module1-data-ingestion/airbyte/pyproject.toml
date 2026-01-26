@@ -8,6 +8,7 @@ requires-python = ">=3.12,<3.14"
 dependencies = [
     "airbyte-cdk>=7.6.5,<8.0",  # Python CDK for building Custom connectors
     "airbyte-api>=0.53.0,<1.0", # Python SDK for interacting w/ API
+    "loguru>=0.7.3",
 ]
 
 [dependency-groups]
