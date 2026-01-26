@@ -1,0 +1,33 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer ********
+      Connection:
+      - keep-alive
+      user-agent:
+      - speakeasy-sdk/python 0.53.0 2.536.0 1.0.0 airbyte-api
+    method: GET
+    uri: http://localhost:8000/api/public/v1/sources/14e21b21-85d5-46b8-916a-df3c087ac4fa?includeSecretCoordinates=false
+  response:
+    body:
+      string: '{"status":404,"type":"https://reference.airbyte.com/reference/errors#resource-not-found","title":"resource-not-found","detail":"The
+        requested resource could not be found.","documentationUrl":null,"data":{"resourceType":"SOURCE_CONNECTION","resourceId":"14e21b21-85d5-46b8-916a-df3c087ac4fa"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '292'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 26 Jan 2026 08:47:58 GMT
+    status:
+      code: 404
+      message: Not Found
+version: 1

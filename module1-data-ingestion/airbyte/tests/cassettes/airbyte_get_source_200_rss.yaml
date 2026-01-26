@@ -1,0 +1,32 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer ********
+      Connection:
+      - keep-alive
+      user-agent:
+      - speakeasy-sdk/python 0.53.0 2.536.0 1.0.0 airbyte-api
+    method: GET
+    uri: http://localhost:8000/api/public/v1/sources/d73fb160-9fbd-457e-891e-22d5ac5b5aee?includeSecretCoordinates=false
+  response:
+    body:
+      string: '{"sourceId":"d73fb160-9fbd-457e-891e-22d5ac5b5aee","name":"hackernews-rss-newest","sourceType":"rss","definitionId":"0efee448-6948-49e2-b786-17db50647908","workspaceId":"1a45e743-3de4-4652-adae-e5b2515668f5","configuration":{"url":"https://hnrss.org/newest"},"createdAt":1768422088}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '282'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 26 Jan 2026 08:47:58 GMT
+    status:
+      code: 200
+      message: Ok
+version: 1
