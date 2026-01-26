@@ -15,8 +15,15 @@ dependencies = [
 dev = [
     "ruff>=0.14.14",
     "jupyterlab>=4.5.3",
+    "pytest>=8.0.0",
+    "vcrpy>=6.0.0",
 ]
 
 [tool.ruff]
 line-length = 100
 lint.select = ["F", "E", "W", "I001"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
