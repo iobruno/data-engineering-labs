@@ -1,17 +1,17 @@
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-17-alpine}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
 
 services:
-  ingest-db:
+  tlc-db:
     image: *postgres-image
-    container_name: ingest-db
+    container_name: tlc-db
     environment:
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'postgres'
-      POSTGRES_DB: 'nyc_taxi'
+      POSTGRES_DB: 'nyc_tlc'
     ports:
       - '5432:5432'
     volumes:
-      - vol-ingest-db:/var/lib/postgresql/data
+      - vol-tlc-db:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -19,6 +19,23 @@ services:
       retries: 5
     restart: on-failure
 
+  tlc-cli:
+    image: iobruno/tlc-cli:latest
+    container_name: tlc-cli
+    pull_policy: build
+    build:
+      dockerfile: ./Dockerfile
+    environment:
+      DB_HOST: 'tlc-db'
+      DB_NAME: 'nyc_tlc'
+      DB_USERNAME: 'postgres'
+      DB_PASSWORD: 'postgres'
+    volumes:
+      - ./datasets.yml:/app/datasets.yml
+    depends_on:
+      tlc-db:
+        condition: service_healthy
+
 volumes:
-  vol-ingest-db:
-    name: vol-ingest-db
+  vol-tlc-db:
+    name: vol-tlc-db

@@ -55,12 +55,12 @@ def ingest_db(
     green: bool = Option(False, "--green", "-g", help="Fetch Green cab dataset"),
     fhv: bool = Option(False, "--fhv", "-f", help="Fetch FHV cab dataset"),
     zones: bool = Option(False, "--zones", "-z", help="Fetch Zone lookup dataset"),
-    polars_ff: bool = Option(False, "--use-polars", help="Feature flag to use Polars"),
+    use_polars: bool = Option(False, "--use-polars", help="Feature flag to use Polars"),
 ):
     if not any([yellow, green, fhv, zones]):
         raise BadParameter("You must either specify at least one dataset flag (-z | -y | -g | -f)")
 
-    if polars_ff:
+    if use_polars:
         conn_str = ctx.obj.get("adbc_conn_string")
         fetcher = PolarsFetcher()
     else:
@@ -72,12 +72,12 @@ def ingest_db(
 
     with progress:
         if green:
-            endpoints = datasets.green_trip_data
+            endpoints = datasets.green_taxi_trip_data
             processor = GreenTaxiProcessor(fetcher, conn_str)
             processor.run(endpoints)
 
         if yellow:
-            endpoints = datasets.yellow_trip_data
+            endpoints = datasets.yellow_taxi_trip_data
             processor = YellowTaxiProcessor(fetcher, conn_str)
             processor.run(endpoints)
 
