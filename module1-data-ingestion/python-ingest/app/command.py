@@ -28,8 +28,8 @@ def test_db_conn(conn_str: str):
         with engine.connect() as conn:
             conn.execute(text("select 1"))
             logger.info("Connection successfully established!")
-    except exc.OperationalError as ex:
-        raise BadParameter(f"You must specify the db credentials with env variables - {ex}")
+    except exc.OperationalError as err:
+        raise BadParameter(f"You must specify the db credentials with env variables - {err}")
 
 
 @cli.callback()

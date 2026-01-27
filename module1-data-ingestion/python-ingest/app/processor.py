@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import Literal, Type
+from typing import Literal
 
 from rich.progress import BarColumn, Progress, TaskID, TextColumn, TimeElapsedColumn
 
@@ -81,7 +81,7 @@ class Processor(metaclass=ABCMeta):
 
 
 class GreenTaxiProcessor(Processor):
-    def schema(self) -> Type[GreenTaxiSchema]:
+    def schema(self) -> type[GreenTaxiSchema]:
         return GreenTaxiSchema
 
     def repo(self, conn_str: str) -> SQLRepo:
@@ -89,7 +89,7 @@ class GreenTaxiProcessor(Processor):
 
 
 class YellowTaxiProcessor(Processor):
-    def schema(self) -> Type[Schema]:
+    def schema(self) -> type[Schema]:
         return YellowTaxiSchema
 
     def repo(self, conn_str: str) -> SQLRepo:
@@ -97,7 +97,7 @@ class YellowTaxiProcessor(Processor):
 
 
 class FhvProcessor(Processor):
-    def schema(self) -> Type[Schema]:
+    def schema(self) -> type[Schema]:
         return FhvSchema
 
     def repo(self, conn_str) -> SQLRepo:
@@ -105,7 +105,7 @@ class FhvProcessor(Processor):
 
 
 class ZoneLookupProcessor(Processor):
-    def schema(self) -> Type[Schema]:
+    def schema(self) -> type[Schema]:
         return ZoneLookupSchema
 
     def repo(self, conn_str) -> SQLRepo:
