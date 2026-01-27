@@ -37,6 +37,7 @@ select = [
 ]
 ignore = [
     "E501",  # line too long (handled by formatter)
+    "RUF013",  # implicit Optional
 ]
 fixable = ["ALL"]
 
