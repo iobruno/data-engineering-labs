@@ -1,6 +1,7 @@
 from os import getenv
+from pathlib import Path
 
-from hydra import compose, initialize
+from box import Box
 from loguru import logger
 from sqlalchemy import create_engine, exc, text
 from typer import BadParameter, Context, Option, Typer
@@ -17,9 +18,9 @@ from app.processor import (
 cli = Typer(no_args_is_help=True)
 
 
-def load_conf():
-    with initialize(version_base=None, config_path="..", job_name="pyingest"):
-        return compose(config_name="datasets")
+def load_conf() -> Box:
+    config_path = Path(__file__).parent.parent / "datasets.yaml"
+    return Box.from_yaml(filename=config_path)
 
 
 def test_db_conn(conn_str: str):
@@ -28,8 +29,8 @@ def test_db_conn(conn_str: str):
         with engine.connect() as conn:
             conn.execute(text("select 1"))
             logger.info("Connection successfully established!")
-    except exc.OperationalError as ex:
-        raise BadParameter(f"You must specify the db credentials with env variables - {ex}")
+    except exc.OperationalError as err:
+        raise BadParameter(f"Missing db credentials in ENV variables - {err}") from err
 
 
 @cli.callback()

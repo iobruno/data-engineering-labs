@@ -3,16 +3,12 @@ from abc import ABCMeta, abstractmethod
 import pandas as pd
 import polars as pl
 
+from app.schemas import Schema
+
 
 class DataframeFetcher(metaclass=ABCMeta):
-    def with_schema(self, schema: dict):
-        def fetch_csv(endpoint: str) -> pl.DataFrame:
-            return self.fetch_csv(endpoint, schema)
-
-        return fetch_csv
-
     @abstractmethod
-    def fetch_csv(self, endpoint: str, schema: dict = None) -> pl.DataFrame | pd.DataFrame:
+    def fetch_csv(self, endpoint: str, schema: type[Schema] = None) -> pl.DataFrame | pd.DataFrame:
         raise NotImplementedError()
 
     @abstractmethod
@@ -25,8 +21,9 @@ class DataframeFetcher(metaclass=ABCMeta):
 
 
 class PolarsFetcher(DataframeFetcher):
-    def fetch_csv(self, endpoint: str, schema: dict = None) -> pl.DataFrame:
-        return pl.read_csv(endpoint, schema_overrides=schema)
+    def fetch_csv(self, endpoint: str, schema: type[Schema] = None) -> pl.DataFrame:
+        schema_dict = schema.polars() if schema else None
+        return pl.read_csv(endpoint, schema_overrides=schema_dict)
 
     def fetch_parquet(self, endpoint: str) -> pl.DataFrame:
         return pl.read_parquet(endpoint)
@@ -39,8 +36,9 @@ class PolarsFetcher(DataframeFetcher):
 
 
 class PandasFetcher(DataframeFetcher):
-    def fetch_csv(self, endpoint: str, schema: dict = None) -> pd.DataFrame:
-        return pd.read_csv(endpoint, engine="pyarrow", dtype=schema)
+    def fetch_csv(self, endpoint: str, schema: type[Schema] = None) -> pd.DataFrame:
+        schema_dict = schema.pyarrow() if schema else None
+        return pd.read_csv(endpoint, engine="pyarrow", dtype=schema_dict)
 
     def fetch_parquet(self, endpoint: str) -> pd.DataFrame:
         return pd.read_parquet(endpoint)

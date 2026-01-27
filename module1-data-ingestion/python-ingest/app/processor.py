@@ -1,10 +1,10 @@
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import Literal, Type
+from typing import Literal
 
 from rich.progress import BarColumn, Progress, TaskID, TextColumn, TimeElapsedColumn
 
-from app.df_fetcher import DataframeFetcher, PandasFetcher, PolarsFetcher
+from app.df_fetcher import DataframeFetcher
 from app.df_repository import FhvRepo, GreenTaxiRepo, SQLRepo, YellowTaxiRepo, ZoneLookupRepo
 from app.schemas import FhvSchema, GreenTaxiSchema, Schema, YellowTaxiSchema, ZoneLookupSchema
 
@@ -34,7 +34,7 @@ class Processor(metaclass=ABCMeta):
         tid, *remain_tasks = tasks
         endpoint, *remain_endpoints = endpoints
 
-        df = self.fetcher.fetch_csv(endpoint, schema=self._fetch_schema())
+        df = self.fetcher.fetch_csv(endpoint, schema=self.schema())
         slices = self.fetcher.slice_in_chunks(df)
         chunk, *remain_chunks = slices
         completeness, total_parts = 1, len(slices)
@@ -64,13 +64,6 @@ class Processor(metaclass=ABCMeta):
             for name in filenames
         ]
 
-    def _fetch_schema(self) -> dict:
-        if isinstance(self.fetcher, PolarsFetcher):
-            return self.schema().polars()
-        elif isinstance(self.fetcher, PandasFetcher):
-            return self.schema().pyarrow()
-        raise NotImplementedError()
-
     @abstractmethod
     def schema(self) -> Schema:
         raise NotImplementedError()
@@ -81,7 +74,7 @@ class Processor(metaclass=ABCMeta):
 
 
 class GreenTaxiProcessor(Processor):
-    def schema(self) -> Type[GreenTaxiSchema]:
+    def schema(self) -> type[GreenTaxiSchema]:
         return GreenTaxiSchema
 
     def repo(self, conn_str: str) -> SQLRepo:
@@ -89,7 +82,7 @@ class GreenTaxiProcessor(Processor):
 
 
 class YellowTaxiProcessor(Processor):
-    def schema(self) -> Type[Schema]:
+    def schema(self) -> type[Schema]:
         return YellowTaxiSchema
 
     def repo(self, conn_str: str) -> SQLRepo:
@@ -97,7 +90,7 @@ class YellowTaxiProcessor(Processor):
 
 
 class FhvProcessor(Processor):
-    def schema(self) -> Type[Schema]:
+    def schema(self) -> type[Schema]:
         return FhvSchema
 
     def repo(self, conn_str) -> SQLRepo:
@@ -105,7 +98,7 @@ class FhvProcessor(Processor):
 
 
 class ZoneLookupProcessor(Processor):
-    def schema(self) -> Type[Schema]:
+    def schema(self) -> type[Schema]:
         return ZoneLookupSchema
 
     def repo(self, conn_str) -> SQLRepo:
