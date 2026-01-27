@@ -8,9 +8,7 @@ from app.schemas import Schema
 
 class DataframeFetcher(metaclass=ABCMeta):
     @abstractmethod
-    def fetch_csv(
-        self, endpoint: str, schema: type[Schema] | None = None
-    ) -> pl.DataFrame | pd.DataFrame:
+    def fetch_csv(self, endpoint: str, schema: type[Schema] = None) -> pl.DataFrame | pd.DataFrame:
         raise NotImplementedError()
 
     @abstractmethod
@@ -23,7 +21,7 @@ class DataframeFetcher(metaclass=ABCMeta):
 
 
 class PolarsFetcher(DataframeFetcher):
-    def fetch_csv(self, endpoint: str, schema: type[Schema] | None = None) -> pl.DataFrame:
+    def fetch_csv(self, endpoint: str, schema: type[Schema] = None) -> pl.DataFrame:
         schema_dict = schema.polars() if schema else None
         return pl.read_csv(endpoint, schema_overrides=schema_dict)
 
@@ -38,7 +36,7 @@ class PolarsFetcher(DataframeFetcher):
 
 
 class PandasFetcher(DataframeFetcher):
-    def fetch_csv(self, endpoint: str, schema: type[Schema] | None = None) -> pd.DataFrame:
+    def fetch_csv(self, endpoint: str, schema: type[Schema] = None) -> pd.DataFrame:
         schema_dict = schema.pyarrow() if schema else None
         return pd.read_csv(endpoint, engine="pyarrow", dtype=schema_dict)
 
