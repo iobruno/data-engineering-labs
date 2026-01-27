@@ -4,7 +4,7 @@ from typing import Literal
 
 from rich.progress import BarColumn, Progress, TaskID, TextColumn, TimeElapsedColumn
 
-from app.df_fetcher import DataframeFetcher, PandasFetcher, PolarsFetcher
+from app.df_fetcher import DataframeFetcher
 from app.df_repository import FhvRepo, GreenTaxiRepo, SQLRepo, YellowTaxiRepo, ZoneLookupRepo
 from app.schemas import FhvSchema, GreenTaxiSchema, Schema, YellowTaxiSchema, ZoneLookupSchema
 
@@ -34,7 +34,7 @@ class Processor(metaclass=ABCMeta):
         tid, *remain_tasks = tasks
         endpoint, *remain_endpoints = endpoints
 
-        df = self.fetcher.fetch_csv(endpoint, schema=self._fetch_schema())
+        df = self.fetcher.fetch_csv(endpoint, schema=self.schema())
         slices = self.fetcher.slice_in_chunks(df)
         chunk, *remain_chunks = slices
         completeness, total_parts = 1, len(slices)
@@ -63,13 +63,6 @@ class Processor(metaclass=ABCMeta):
             progress.add_task(name, start=False, total=float("inf"), completed=0)
             for name in filenames
         ]
-
-    def _fetch_schema(self) -> dict:
-        if isinstance(self.fetcher, PolarsFetcher):
-            return self.schema().polars()
-        elif isinstance(self.fetcher, PandasFetcher):
-            return self.schema().pyarrow()
-        raise NotImplementedError()
 
     @abstractmethod
     def schema(self) -> Schema:
