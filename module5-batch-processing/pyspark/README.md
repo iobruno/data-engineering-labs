@@ -47,15 +47,16 @@ pre-commit install
 
 **4.** Spin up the Spark Cluster with:
 ```shell
-docker compose up -d
+docker compose -f ../compose.yaml up -d
 ```
 
 ## TODO's:
 - [x] PEP-517: Packaging and dependency management with `uv`
-- [x] Code format/lint with Ruff
-- [X] Set up a Jupyter Playground for PySpark
-- [X] Enable Spark to read from Google Cloud Storage
-- [ ] Enable Spark to read from AWS S3
+- [x] Spin up a Spark Cluster in Standalone mode w/ Spark Connect
+- [x] `submit` a PySpark Job to the cluster with Spark Connect
+- [x] `spark-submit` a PySpark Job to the cluster in `--deploy-mode client`
+- [x] Enable Spark to read from Google Cloud Storage
 - [ ] Submit a PySpark job to Google Dataproc
+- [ ] Enable Spark to read from AWS S3
 - [ ] Deploy [Spark to Kubernetes with Helm](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) with [minikube](https://minikube.sigs.k8s.io/docs/start/) or [kind](https://kind.sigs.k8s.io/)
 - [ ] Submit a PySpark job to the K8s Spark Cluster
