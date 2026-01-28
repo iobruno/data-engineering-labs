@@ -1,0 +1,88 @@
+x-spark-image: &spark-image spark:${SPARK_VERSION:-4.0.1-scala2.13-java21-python3-ubuntu}
+
+services:
+  spark-master:
+    image: *spark-image
+    container_name: spark-master
+    command: |
+      /opt/spark/sbin/start-master.sh
+      --properties-file /opt/spark/conf/spark-standalone.conf      
+    environment:
+      SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
+    ports:
+      - '4040:8080'               # Spark Master WebUI port (4040 → 8080 in Spark 4.x)
+      - '7077:7077'
+    volumes:
+      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
+      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
+      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
+    restart: on-failure
+
+  spark-worker1:
+    image: *spark-image
+    container_name: spark-worker1
+    command: > 
+      /opt/spark/sbin/start-worker.sh 
+      spark://spark-master:7077 
+      --cores 2
+      --memory 4G
+      --properties-file /opt/spark/conf/spark-standalone.conf
+    environment:
+      SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
+    ports:
+      - '4041:8081'               # Spark Worker WebUI port (4041 → 8081 in Spark 4.x)
+    volumes:
+      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
+      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
+      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
+    depends_on:
+      spark-master:
+        condition: service_started
+    restart: on-failure
+
+  spark-worker2:
+    image: *spark-image
+    container_name: spark-worker2
+    command: > 
+      /opt/spark/sbin/start-worker.sh 
+      spark://spark-master:7077 
+      --cores 4
+      --memory 6G
+      --properties-file /opt/spark/conf/spark-standalone.conf
+    environment:
+      SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
+    ports:
+      - '4042:8081'               # Spark Worker WebUI port (4042 → 8081 in Spark 4.x)
+    volumes:
+      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
+      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
+      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
+    depends_on:
+      spark-master:
+        condition: service_started
+    restart: on-failure
+
+  spark-connect:
+    image: *spark-image
+    container_name: spark-connect
+    command: |
+      /opt/spark/sbin/start-connect-server.sh
+      --master spark://spark-master:7077
+      --properties-file /opt/spark/conf/spark-standalone.conf
+      --jars /opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
+    environment:
+      SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
+    ports:
+      - '15002:15002'
+    depends_on:
+      spark-master:
+        condition: service_started
+    volumes:
+      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
+      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
+      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
+    restart: on-failure
+
+volumes:
+  vol-spark-extra-jars:
+    name: vol-spark-extra-jars

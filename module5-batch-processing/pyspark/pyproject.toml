@@ -1,13 +1,14 @@
 [project]
-name = "pyspark-playground"
-version = "1.0"
-description = "Batch processing with PySpark"
+name = "pyspark-batch"
+version = "2.0"
+description = "Batch processing with PySpark 4"
 readme = "README.md"
-requires-python = ">=3.11,<3.12"
+requires-python = ">=3.12,<3.14"
 
 dependencies = [
-    "pyspark>=3.5.3,<4.0",
-    "pyarrow>=19.0.0,<20.0",
+    "pyspark-client>=4.0.1,<4.1",   # for Spark-Connect
+    "pyspark>=4.0.1,<4.1",
+    "pyarrow>=23.0.0,<24.0",
 ]
 
 [dependency-groups]
@@ -36,7 +37,8 @@ select = [
     "RUF",  # Ruff-specific rules
 ]
 ignore = [
-    "E501",  # line too long (handled by formatter)
+    "E501",    # line too long (handled by formatter)
+    "RUF013",  # implicit Optional
 ]
 fixable = ["ALL"]
 
