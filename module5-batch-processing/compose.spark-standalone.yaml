@@ -13,8 +13,9 @@ services:
       - '4040:8080'               # Spark Master WebUI port (4040 → 8080 in Spark 4.x)
       - '7077:7077'
     volumes:
-      - vol-spark-extra-jars:/opt/spark/jars/extra
+      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
       - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
+      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
     restart: on-failure
 
   spark-worker1:
@@ -31,8 +32,9 @@ services:
     ports:
       - '4041:8081'               # Spark Worker WebUI port (4041 → 8081 in Spark 4.x)
     volumes:
-      - vol-spark-extra-jars:/opt/spark/jars/extra
+      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
       - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
+      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
     depends_on:
       spark-master:
         condition: service_started
@@ -52,8 +54,9 @@ services:
     ports:
       - '4042:8081'               # Spark Worker WebUI port (4042 → 8081 in Spark 4.x)
     volumes:
-      - vol-spark-extra-jars:/opt/spark/jars/extra
+      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
       - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
+      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
     depends_on:
       spark-master:
         condition: service_started
@@ -66,6 +69,7 @@ services:
       /opt/spark/sbin/start-connect-server.sh
       --master spark://spark-master:7077
       --properties-file /opt/spark/conf/spark-standalone.conf
+      --jars /opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
     environment:
       SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
     ports:
@@ -74,8 +78,9 @@ services:
       spark-master:
         condition: service_started
     volumes:
-      - vol-spark-extra-jars:/opt/spark/jars/extra
+      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
       - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
+      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
     restart: on-failure
 
 volumes:
