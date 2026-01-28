@@ -14,7 +14,7 @@ services:
       - '7077:7077'
     volumes:
       - vol-spark-extra-jars:/opt/spark/jars/extra
-      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf:ro
+      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
     restart: on-failure
 
   spark-worker1:
@@ -32,7 +32,7 @@ services:
       - '4041:8081'               # Spark Worker WebUI port (4041 → 8081 in Spark 4.x)
     volumes:
       - vol-spark-extra-jars:/opt/spark/jars/extra
-      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf:ro
+      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
     depends_on:
       spark-master:
         condition: service_started
@@ -53,7 +53,7 @@ services:
       - '4042:8081'               # Spark Worker WebUI port (4042 → 8081 in Spark 4.x)
     volumes:
       - vol-spark-extra-jars:/opt/spark/jars/extra
-      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf:ro
+      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
     depends_on:
       spark-master:
         condition: service_started
@@ -64,6 +64,7 @@ services:
     container_name: spark-connect
     command: |
       /opt/spark/sbin/start-connect-server.sh
+      --master spark://spark-master:7077
       --properties-file /opt/spark/conf/spark-standalone.conf
     environment:
       SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
@@ -74,7 +75,7 @@ services:
         condition: service_started
     volumes:
       - vol-spark-extra-jars:/opt/spark/jars/extra
-      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf:ro
+      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
     restart: on-failure
 
 volumes:
