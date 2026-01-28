@@ -1,7 +1,7 @@
 # Batch processing with PySpark
 
-![Python](https://img.shields.io/badge/Python-3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
-[![PySpark](https://img.shields.io/badge/PySpark-4.x-262A38?style=flat-square&logo=apachespark&logoColor=E36B22&labelColor=262A38)](https://spark.apache.org/docs/latest/api/python/user_guide)
+![Python](https://img.shields.io/badge/Python-3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
+[![PySpark](https://img.shields.io/badge/PySpark-4.0-262A38?style=flat-square&logo=apachespark&logoColor=E36B22&labelColor=262A38)](https://spark.apache.org/docs/latest/api/python/user_guide)
 [![JDK](https://img.shields.io/badge/JDK-21_|_17-35667C?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1D213B)](https://sdkman.io/)
 [![SDKMan](https://img.shields.io/badge/SDKMan-35667C?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1D213B)](https://sdkman.io/)
 [![uv](https://img.shields.io/badge/astral/uv-261230?style=flat&logo=uv&logoColor=DE5FE9&labelColor=261230)](https://docs.astral.sh/uv/getting-started/installation/)
@@ -14,7 +14,7 @@ Welcome to
       ____              __
      / __/__  ___ _____/ /__
     _\ \/ _ \/ _ `/ __/  '_/
-   /__ / .__/\_,_/_/ /_/\_\   version 4.1.1
+   /__ / .__/\_,_/_/ /_/\_\   version 4.0.1
       /_/
 
 Using Python version 3.14.2 (main, Jan 14 2026 23:37:46)
