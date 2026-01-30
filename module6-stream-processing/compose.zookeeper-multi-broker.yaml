@@ -1,13 +1,13 @@
-x-cp-zookeeper-image: &cp-zookeeper-image confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
-x-cp-kafka-image: &cp-kafka-image confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
-x-cp-schema-registry-image: &cp-schema-registry-image confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
-x-cp-rest-proxy-image: &cp-restproxy-image confluentinc/cp-kafka-rest:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
-x-cp-ksqldb-server-image: &cp-ksqldb-server-image confluentinc/cp-ksqldb-server:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
-x-cp-ksqldb-cli-image: &cp-ksqldb-cli-image confluentinc/cp-ksqldb-cli:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
+x-cp-zookeeper-image: &cp-zookeeper-image confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION:-7.9.5}
+x-cp-kafka-image: &cp-kafka-image confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.9.5}
+x-cp-schema-registry-image: &cp-schema-registry-image confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION:-7.9.5}
+x-cp-rest-proxy-image: &cp-restproxy-image confluentinc/cp-kafka-rest:${CONFLUENT_PLATFORM_VERSION:-7.9.1}
+x-cp-ksqldb-server-image: &cp-ksqldb-server-image confluentinc/cp-ksqldb-server:${CONFLUENT_PLATFORM_VERSION:-7.9.5}
+x-cp-ksqldb-cli-image: &cp-ksqldb-cli-image confluentinc/cp-ksqldb-cli:${CONFLUENT_PLATFORM_VERSION:-7.9.5}
 
-x-conduktor-console: &conduktor-console-image conduktor/conduktor-console:${CONDUKTOR_PLATFORM_VERSION:-1.29.2}
-x-conduktor-cortex: &conduktor-cortex-image conduktor/conduktor-console-cortex:${CONDUKTOR_PLATFORM_VERSION:-1.29.2}
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-17-alpine}
+x-conduktor-console: &conduktor-console-image conduktor/conduktor-console:${CONDUKTOR_PLATFORM_VERSION:-1.42.0}
+x-conduktor-cortex: &conduktor-cortex-image conduktor/conduktor-console-cortex:${CONDUKTOR_PLATFORM_VERSION:-1.42.0}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
 
 x-kafka-common:
   &kafka-common
@@ -24,7 +24,7 @@ x-kafka-common:
     zookeeper:
       condition: service_healthy
   healthcheck:
-    test: ["CMD-SHELL", "cub kafka-ready -b localhost:29092 1 10 || exit 1"]
+    test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:29092 || exit 1"]
     start_period: 10s
     interval: 5s
     timeout: 10s
@@ -70,6 +70,7 @@ services:
     container_name: zookeeper
     hostname: zookeeper
     environment:
+      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=*"
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 5
@@ -79,7 +80,7 @@ services:
       - vol-zk-data:/var/lib/zookeeper/data
       - vol-zk-logs:/var/lib/zookeeper/log
     healthcheck:
-      test: ["CMD-SHELL", "cub zk-ready localhost:2181 30 || exit 1"]
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok || exit 1"]
       interval: 10s
       timeout: 30s
       retries: 10
@@ -140,7 +141,7 @@ services:
       - '8081:8081'
     depends_on: *depends-on-kafka-brokers
     healthcheck:
-      test: ["CMD-SHELL", "cub sr-ready localhost 8081 30 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/subjects || exit 1"]
       start_period: 10s
       interval: 5s
       timeout: 10s
@@ -161,7 +162,7 @@ services:
     depends_on:
       <<: *depends-on-kafka-cluster
     healthcheck:
-      test: ["CMD-SHELL", "cub ksql-server-ready localhost 8088 30 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8088/healthcheck || exit 1"]
       interval: 10s
       timeout: 30s
       retries: 5
@@ -192,7 +193,7 @@ services:
     depends_on:
       <<: *depends-on-kafka-cluster
     healthcheck:
-      test: ["CMD-SHELL", "cub kr-ready localhost 8082 30 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8082/ || exit 1"]
       start_period: 10s
       interval: 5s
       timeout: 10s

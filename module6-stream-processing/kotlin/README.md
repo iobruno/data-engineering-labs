@@ -1,6 +1,6 @@
 # Stream processing with Kafka, ksqlDB and Kotlin
 
-[![Kafka](https://img.shields.io/badge/Confluent_Platform-7.8-141414?style=flat&logo=apachekafka&logoColor=white&labelColor=141414)](https://docs.confluent.io/platform/current/)
+[![Kafka](https://img.shields.io/badge/Confluent_Platform-8.1-141414?style=flat&logo=apachekafka&logoColor=white&labelColor=141414)](https://docs.confluent.io/platform/current/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1-603DC0.svg?style=flat&logo=kotlin&logoColor=white&labelColor=603DC0)](https://github.com/JetBrains/kotlin/releases/tag/v2.1.10)
 [![JDK](https://img.shields.io/badge/JDK-21_|_17-1076C6?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1076C6)](https://sdkman.io/)
 [![Gradle](https://img.shields.io/badge/gradle-8.12-02303A?style=flat&logo=gradle&logoColor=white&labelColor=02303A)](https://gradle.org/releases/)

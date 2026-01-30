@@ -1,13 +1,13 @@
 # Kafka Streams with ksqlDB
 
-[![Kafka](https://img.shields.io/badge/Confluent_Platform-7.8-141414?style=flat&logo=apachekafka&logoColor=white&labelColor=141414)](https://docs.confluent.io/platform/current/)
+[![Kafka](https://img.shields.io/badge/Confluent_Platform-8.1-141414?style=flat&logo=apachekafka&logoColor=white&labelColor=141414)](https://docs.confluent.io/platform/current/)
 [![Docker](https://img.shields.io/badge/Docker-329DEE?style=flat&logo=docker&logoColor=white&labelColor=329DEE)](https://docs.docker.com/get-docker/)
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
 
 This contains the SQL statements to build the KStreams and KTables for ksqlDB to allow an overview of Green and FHV Trips distribution
 
-```shell
+```text
         ===========================================
         =       _              _ ____  ____       =
         =      | | _____  __ _| |  _ \| __ )      =
@@ -21,7 +21,7 @@ This contains the SQL statements to build the KStreams and KTables for ksqlDB to
 
 Copyright 2017-2022 Confluent Inc.
 
-CLI v7.8.0, Server v7.8.0 located at http://ksqldb0:8088
+CLI v8.1.1, Server v8.1.1 located at http://ksqldb0:808
 Server Status: RUNNING
 
 Having trouble? Type 'help' (case-insensitive) for a rundown of how things work!

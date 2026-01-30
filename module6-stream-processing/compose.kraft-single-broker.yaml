@@ -1,12 +1,11 @@
-x-cp-kafka-image: &cp-kafka-image confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
-x-cp-schema-registry-image: &cp-schema-registry-image confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
-x-cp-rest-proxy-image: &cp-restproxy-image confluentinc/cp-kafka-rest:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
-x-cp-ksqldb-server-image: &cp-ksqldb-server-image confluentinc/cp-ksqldb-server:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
-x-cp-ksqldb-cli-image: &cp-ksqldb-cli-image confluentinc/cp-ksqldb-cli:${CONFLUENT_PLATFORM_VERSION:-7.8.0}
+x-cp-kafka-image: &cp-kafka-image confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-8.1.1}
+x-cp-schema-registry-image: &cp-schema-registry-image confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION:-8.1.1}
+x-cp-rest-proxy-image: &cp-restproxy-image confluentinc/cp-kafka-rest:${CONFLUENT_PLATFORM_VERSION:-8.1.1}
+x-cp-ksqldb-server-image: &cp-ksqldb-server-image confluentinc/cp-ksqldb-server:${CONFLUENT_PLATFORM_VERSION:-8.1.1}
 
-x-conduktor-console: &conduktor-console-image conduktor/conduktor-console:${CONDUKTOR_PLATFORM_VERSION:-1.29.2}
-x-conduktor-cortex: &conduktor-cortex-image conduktor/conduktor-console-cortex:${CONDUKTOR_PLATFORM_VERSION:-1.29.2}
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-17-alpine}
+x-conduktor-console: &conduktor-console-image conduktor/conduktor-console:${CONDUKTOR_PLATFORM_VERSION:-1.42.0}
+x-conduktor-cortex: &conduktor-cortex-image conduktor/conduktor-console-cortex:${CONDUKTOR_PLATFORM_VERSION:-1.42.0}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
 
 x-kafka-common:
   &kafka-common
@@ -22,7 +21,7 @@ x-kafka-common:
     KAFKA_DELETE_TOPIC_ENABLE: true
     KAFKA_JMX_PORT: 9999
   healthcheck:
-    test: ["CMD-SHELL", "cub kafka-ready -b localhost:29092 1 10 || exit 1"]
+    test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:29092 || exit 1"]
     start_period: 10s
     interval: 5s
     timeout: 10s
@@ -85,7 +84,7 @@ services:
       broker0:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "cub sr-ready localhost 8081 30 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/subjects || exit 1"]
       start_period: 10s
       interval: 5s
       timeout: 10s
@@ -106,14 +105,14 @@ services:
     depends_on: 
       <<: *depends-on-kafka-cluster
     healthcheck:
-      test: ["CMD-SHELL", "cub ksql-server-ready localhost 8088 30 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8088/healthcheck || exit 1"]
       interval: 10s
       timeout: 30s
       retries: 5
     restart: on-failure:5
 
   ksqlcli:
-    image: *cp-ksqldb-cli-image
+    image: *cp-ksqldb-server-image
     container_name: ksqlcli
     hostname: ksqlcli
     entrypoint: /bin/bash
@@ -137,7 +136,7 @@ services:
     depends_on: 
       <<: *depends-on-kafka-cluster
     healthcheck:
-      test: ["CMD-SHELL", "cub kr-ready localhost 8082 30 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8082/ || exit 1"]
       start_period: 10s
       interval: 5s
       timeout: 10s
