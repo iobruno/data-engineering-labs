@@ -1,8 +1,8 @@
-x-redpanda-image: &redpanda-image redpandadata/redpanda:${REDPANDA_VERSION:-v24.2.13}
+x-redpanda-image: &redpanda-image redpandadata/redpanda:${REDPANDA_VERSION:-v25.3.6}
 
-x-conduktor-console: &conduktor-console-image conduktor/conduktor-console:${CONDUKTOR_PLATFORM_VERSION:-1.29.2}
-x-conduktor-cortex: &conduktor-cortex-image conduktor/conduktor-console-cortex:${CONDUKTOR_PLATFORM_VERSION:-1.29.2}
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-17-alpine}
+x-conduktor-console: &conduktor-console-image conduktor/conduktor-console:${CONDUKTOR_PLATFORM_VERSION:-1.42.0}
+x-conduktor-cortex: &conduktor-cortex-image conduktor/conduktor-console-cortex:${CONDUKTOR_PLATFORM_VERSION:-1.42.0}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
 
 services:
   broker0:
