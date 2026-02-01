@@ -1,6 +1,6 @@
-# Workflow orchestration with Airflow
+# Workflow orchestration with Airflow 2.x
 
-![Python](https://img.shields.io/badge/Python-3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
+![Python](https://img.shields.io/badge/Python-3.11-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
 [![Airflow](https://img.shields.io/badge/Airflow-2.10-007CEE?style=flat&logo=apacheairflow&logoColor=white&labelColor=14193A)](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/taskflow.html)
 [![Pandas](https://img.shields.io/badge/pandas-150458?style=flat&logo=pandas&logoColor=E70488&labelColor=150458)](https://pandas.pydata.org/docs/user_guide/)
 [![uv](https://img.shields.io/badge/astral/uv-261230?style=flat&logo=uv&logoColor=DE5FE9&labelColor=261230)](https://docs.astral.sh/uv/getting-started/installation/)
@@ -8,21 +8,24 @@
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
 
-This setups the infrastructure for Airflow, in Docker, as close as possible to a deploy in a Kubernetes/Helm environment: having containers for the `airflow-scheduler`, `airflow-web`, `airflow-triggerer`, and `airflow-worker` (with the CeleryExecutor)
+This sets up an Airflow infrastructure in Docker that mirrors, as close as possible, Airflow deployments on Kubernetes (via Helm charts), making it easier to develop locally while keeping production parity.
+
+It also uses the same base image as [GCP Composer for Airflow](https://docs.cloud.google.com/composer/docs/composer-versions), ensuring compatibility if you plan to deploy to Google Cloud Platform.
 
 
 ## Getting Started
 
 **1.** Start setting up the infrastructure in Docker with:
-
-Airflow with CeleryExecutor:
 ```shell
-docker compose -f compose.celery.yaml up -d
+docker compose up --build --force-recreate -d
 ```
 
-Airflow with LocalExecutor:
+The default [compose.yaml](./compose.yaml) is a symlink to the **LocalExecutor**.
+
+Alternatively you can run it with the **CeleryExecutor** with:
+
 ```shell
-docker compose -f compose.local.yaml up -d
+docker compose -f compose.celery.yaml up --build --force-recreate -d
 ```
 
 **2.** Airflow WebUI can be accessed at:
@@ -30,14 +33,10 @@ docker compose -f compose.local.yaml up -d
 open http://localhost:8080
 ```
 
-**3.** Airflow DAGs:
-
-To deploy Airflow DAGs, just move them inside the [dags](dags/) folder and Airflow should pick it up soon enough
 
 ## TODO's:
 - [x] PEP-517: Packaging and dependency management with `uv`
 - [x] Code format/lint with Ruff
 - [x] Run Airflow DAGs on Docker
-- [ ] Build Airflow DAGs with [TaskFlow API](https://airflow.apache.org/docs/apache-airflow/stable/tutorial/taskflow.html)
 - [ ] Deploy [Airflow to Kubernetes with Helm](https://airflow.apache.org/docs/helm-chart/stable/index.html)
-- [ ] Run/Deploy [Airflow DAGs on Kubernetes with KubernetesPodOperator](https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html)
+- [ ] Run Airflow DAGs on Kubernetes using the [KubernetesPodOperator](https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html)

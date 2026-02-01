@@ -1,22 +1,25 @@
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-17-alpine}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
+x-redis-image: &redis-image redis:${REDIS_VERSION:-8.4-alpine}
 
 x-airflow-common:
   &airflow-common
   build:
     context: .
-    dockerfile: Dockerfile.LocalExecutor
+    dockerfile: Dockerfile.CeleryExecutor
   pull_policy: build
-  image: apache/airflow:2.10-python3.12-local
+  image: apache/airflow:slim-2.10.5-python3.11-celery
   user: "${AIRFLOW_UID:-50000}:0"
   environment:
     &airflow-common-env
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-metastore/airflow
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@airflow-metastore/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://:@airflow-redis:6379/0
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
@@ -26,15 +29,17 @@ x-airflow-common:
   depends_on:
     airflow-metastore:
       condition: service_healthy
+    airflow-redis:
+      condition: service_healthy
 
 services:
-  ingest-db:
+  tlc-db:
     image: *postgres-image
-    container_name: ingest-db
+    container_name: tlc-db
     environment:
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'postgres'
-      POSTGRES_DB: 'nyc_taxi'
+      POSTGRES_DB: 'nyc_tlc'
     ports:
       - '5432:5432'
     volumes:
@@ -56,9 +61,21 @@ services:
     ports:
       - '5432'
     volumes:
-      - vol-airflow-metastore-localexec:/var/lib/postgresql/data
+      - vol-airflow-metastore-celeryexec:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: on-failure
+
+  airflow-redis:
+    image: *redis-image
+    container_name: airflow-redis
+    ports:
+      - '6379'
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -72,6 +89,22 @@ services:
       - '8974'
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://localhost:8974/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: on-failure
+
+  airflow-worker:
+    <<: *airflow-common
+    container_name: airflow-worker
+    command: ["airflow", "celery", "worker"]
+    environment:
+      <<: *airflow-common-env
+      DUMB_INIT_SETSID: "0"
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}" || celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
       interval: 5s
       timeout: 10s
       retries: 5
@@ -101,6 +134,19 @@ services:
       retries: 5
     restart: on-failure
 
+  airflow-flower:
+    <<: *airflow-common
+    container_name: airflow-flower
+    command: ["airflow", "celery", "flower", "--basic-auth=airflow:airflow"]
+    ports:
+      - '5555:5555'
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -u airflow:airflow http://localhost:5555"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: on-failure
+
   airflow-init:
     <<: *airflow-common
     container_name: airflow-init
@@ -125,5 +171,5 @@ services:
 volumes:
   vol-ingest-db:
     name: vol-ingest-db
-  vol-airflow-metastore-localexec:
-    name: vol-airflow-metastore-localexec
+  vol-airflow-metastore-celeryexec:
+    name: vol-airflow-metastore-celeryexec
