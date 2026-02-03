@@ -13,11 +13,19 @@ Experiment with stream processing using `Kotlin`, `Kafka`, and `ksqlDB`, providi
 
 ## Getting Started
 
-**1.** Install JDK 21 or 17 (earlier versions are deprecated) for Spark 4.x with [SDKMan](https://sdkman.io/):
+**1.** Install JDK 21 or 17 (earlier versions are deprecated) with [SDKMan](https://sdkman.io/):
+
+**GraalVM (Native)**
+```
+sdk i java 23.1.9.r21-nik   # JDK 21
+sdk i java 23.0.11.r17-nik  # JDK 17
+```
+**Standard JDK**
 ```shell
 sdk i java 21.0.10-librca
 sdk i java 17.0.18-librca
 ```
+
 
 **2.** (Optional) Install pre-commit:
 ```shell
@@ -28,7 +36,12 @@ pre-commit install
 ```
 
 **3.** Build and generate the application artifact:
+
 ```shell
+# Native - requires GraalVM
+./gradlew nativeCompile
+
+# fatJar - Standard JDK
 ./gradlew clean shadowJar
 ```
 
@@ -39,6 +52,10 @@ docker compose up -d
 
 **5.** Run the application with and check the subcommands:
 ```shell
+# Native - requires GraalVM
+./build/native/nativeCompile/kotlin-sp
+
+# fatJar - Standard JDK
 java -jar build/libs/kotlin-sp-2.0.jar
 ```
 ```text
@@ -50,7 +67,11 @@ Commands:
 
 **5.1.** CLI for ProducerApp
 ```shell
- java -jar build/libs/kotlin-sp-2.0.jar producer
+# Native - requires GraalVM
+./build/native/nativeCompile/kotlin-sp producer
+
+# fatJar - Standard JDK
+java -jar build/libs/kotlin-sp-2.0.jar producer
 ```
 ```text
 Parse data from source dataset and publish as JSON to Kafka
@@ -61,6 +82,10 @@ Commands:
 ```
 
 ```shell
+# Native - requires GraalVM
+./build/native/nativeCompile/kotlin-sp producer [green|yellow|fhv]
+
+# fatJar - Standard JDK
 java -jar build/libs/kotlin-sp-2.0.jar producer [green|yellow|fhv]
 ```
 ```text
@@ -72,6 +97,10 @@ Process [GreenTaxiDTO|YellowTaxiDTO|FhvTaxiDTO] data from CSV file and publish t
 
 **5.2.** CLI for ConsumerApp
 ```shell
+# Native - requires GraalVM
+./build/native/nativeCompile/kotlin-sp consumer
+
+# fatJar - Standard JDK
 java -jar build/libs/kotlin-sp-2.0.jar consumer
 ```
 ```text
@@ -83,6 +112,10 @@ Commands:
 ```
 
 ```shell
+# Native - requires GraalVM
+./build/native/nativeCompile/kotlin-sp consumer [green|yellow|fhv]
+
+# fatJar - Standard JDK
 java -jar build/libs/kotlin-sp-2.0.jar consumer [green|yellow|fhv]
 ```
 ```text

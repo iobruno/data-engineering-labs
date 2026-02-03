@@ -4,8 +4,8 @@ import io.gitlab.arturbosch.detekt.Detekt
 plugins {
     kotlin("jvm")
     kotlin("kapt")
-    id("org.graalvm.buildtools.native")
     id("com.gradleup.shadow")
+    id("org.graalvm.buildtools.native")
     id("io.gitlab.arturbosch.detekt")
 }
 
