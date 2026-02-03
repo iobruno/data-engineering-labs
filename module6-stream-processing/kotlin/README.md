@@ -1,7 +1,7 @@
 # Stream processing with Kafka, ksqlDB and Kotlin
 
 [![Kafka](https://img.shields.io/badge/Confluent_Platform-8.1-141414?style=flat&logo=apachekafka&logoColor=white&labelColor=141414)](https://docs.confluent.io/platform/current/)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.1-262A38?style=flat-square&logo=kotlin&logoColor=603DC0&labelColor=262A38)](https://github.com/Kotlin/kotlin-spark-api)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.2-262A38?style=flat-square&logo=kotlin&logoColor=603DC0&labelColor=262A38)](https://github.com/Kotlin/kotlin-spark-api)
 [![JDK](https://img.shields.io/badge/JDK-21_|_17-35667C?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1D213B)](https://sdkman.io/)
 [![Gradle](https://img.shields.io/badge/gradle-9.3-31ADC3?style=flat&logo=gradle&logoColor=white&labelColor=011E24)](https://gradle.org/releases/)
 [![Docker](https://img.shields.io/badge/Docker-329DEE?style=flat&logo=docker&logoColor=white&labelColor=329DEE)](https://docs.docker.com/get-docker/)
@@ -39,7 +39,7 @@ docker compose up -d
 
 **5.** Run the application with and check the subcommands:
 ```shell
-java -jar build/libs/kafka-stream-processing-1.0.jar
+java -jar build/libs/kotlin-sp-2.0.jar
 ```
 ```text
 Commands:
@@ -50,7 +50,7 @@ Commands:
 
 **5.1.** CLI for ProducerApp
 ```shell
-java -jar build/libs/kafka-stream-processing-1.0.jar producer
+ java -jar build/libs/kotlin-sp-2.0.jar producer
 ```
 ```text
 Parse data from source dataset and publish as JSON to Kafka
@@ -61,7 +61,7 @@ Commands:
 ```
 
 ```shell
-java -jar build/libs/kafka-stream-processing-1.0.jar producer [green|yellow|fhv]
+java -jar build/libs/kotlin-sp-2.0.jar producer [green|yellow|fhv]
 ```
 ```text
 Process [GreenTaxiDTO|YellowTaxiDTO|FhvTaxiDTO] data from CSV file and publish to Kafka topic
@@ -72,7 +72,7 @@ Process [GreenTaxiDTO|YellowTaxiDTO|FhvTaxiDTO] data from CSV file and publish t
 
 **5.2.** CLI for ConsumerApp
 ```shell
-java -jar build/libs/kafka-stream-processing-1.0.jar consumer
+java -jar build/libs/kotlin-sp-2.0.jar consumer
 ```
 ```text
 Subscribe and consume records from Kafka topic
@@ -83,7 +83,7 @@ Commands:
 ```
 
 ```shell
-java -jar build/libs/kafka-stream-processing-1.0.jar consumer [green|yellow|fhv]
+java -jar build/libs/kotlin-sp-2.0.jar consumer [green|yellow|fhv]
 ```
 ```text
 Deserialize ConsumerRecords from source Kafka topic to [GreenTaxiDTO|YellowTaxiDTO|FhvTaxiDTO]
