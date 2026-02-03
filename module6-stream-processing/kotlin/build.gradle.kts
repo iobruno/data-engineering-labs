@@ -4,13 +4,13 @@ import io.gitlab.arturbosch.detekt.Detekt
 plugins {
     kotlin("jvm")
     kotlin("kapt")
+    id("com.gradleup.shadow")
     id("org.graalvm.buildtools.native")
-    id("com.github.johnrengelman.shadow")
     id("io.gitlab.arturbosch.detekt")
 }
 
 val artifactName = "kotlin-sp"
-val artifactVersion = "2.0-SNAPSHOT"
+val artifactVersion = "2.0"
 
 repositories {
     mavenLocal()

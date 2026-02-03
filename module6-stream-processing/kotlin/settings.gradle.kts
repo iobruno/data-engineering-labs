@@ -9,7 +9,7 @@ pluginManagement {
         kotlin("jvm") version kotlinVersion
         kotlin("kapt") version kaptVersion
         id("org.graalvm.buildtools.native") version graalvmBuildToolsVersion
-        id("com.github.johnrengelman.shadow") version shadowJarVersion
+        id("com.gradleup.shadow") version shadowJarVersion
         id("io.gitlab.arturbosch.detekt") version detektVersion
     }
 

@@ -1,9 +1,9 @@
 # Stream processing with Kafka, ksqlDB and Kotlin
 
 [![Kafka](https://img.shields.io/badge/Confluent_Platform-8.1-141414?style=flat&logo=apachekafka&logoColor=white&labelColor=141414)](https://docs.confluent.io/platform/current/)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.1-603DC0.svg?style=flat&logo=kotlin&logoColor=white&labelColor=603DC0)](https://github.com/JetBrains/kotlin/releases/tag/v2.1.10)
-[![JDK](https://img.shields.io/badge/JDK-21_|_17-1076C6?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1076C6)](https://sdkman.io/)
-[![Gradle](https://img.shields.io/badge/gradle-8.12-02303A?style=flat&logo=gradle&logoColor=white&labelColor=02303A)](https://gradle.org/releases/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.2-262A38?style=flat-square&logo=kotlin&logoColor=603DC0&labelColor=262A38)](https://github.com/Kotlin/kotlin-spark-api)
+[![JDK](https://img.shields.io/badge/JDK-21_|_17-35667C?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1D213B)](https://sdkman.io/)
+[![Gradle](https://img.shields.io/badge/gradle-9.3-31ADC3?style=flat&logo=gradle&logoColor=white&labelColor=011E24)](https://gradle.org/releases/)
 [![Docker](https://img.shields.io/badge/Docker-329DEE?style=flat&logo=docker&logoColor=white&labelColor=329DEE)](https://docs.docker.com/get-docker/)
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
@@ -13,11 +13,19 @@ Experiment with stream processing using `Kotlin`, `Kafka`, and `ksqlDB`, providi
 
 ## Getting Started
 
-**1.** Install `JDK` 17 (or 11). You can do so easily with [SDKMAN!](https://sdkman.io/):
+**1.** Install JDK 21 or 17 (earlier versions are deprecated) with [SDKMan](https://sdkman.io/):
 
-```shell
-sdk i java 17.0.9-librca
+**GraalVM (Native)**
 ```
+sdk i java 23.1.9.r21-nik   # JDK 21
+sdk i java 23.0.11.r17-nik  # JDK 17
+```
+**Standard JDK**
+```shell
+sdk i java 21.0.10-librca
+sdk i java 17.0.18-librca
+```
+
 
 **2.** (Optional) Install pre-commit:
 ```shell
@@ -28,18 +36,27 @@ pre-commit install
 ```
 
 **3.** Build and generate the application artifact:
+
 ```shell
+# Native - requires GraalVM
+./gradlew nativeCompile
+
+# fatJar - Standard JDK
 ./gradlew clean shadowJar
 ```
 
 **4.** Start Kafka, Schema Registry and others from the parent directory:
 ```shell
-docker compose -f ../docker-compose.yml up -d
+docker compose up -d
 ```
 
 **5.** Run the application with and check the subcommands:
 ```shell
-java -jar build/libs/kafka-stream-processing-1.0.jar
+# Native - requires GraalVM
+./build/native/nativeCompile/kotlin-sp
+
+# fatJar - Standard JDK
+java -jar build/libs/kotlin-sp-2.0.jar
 ```
 ```text
 Commands:
@@ -50,7 +67,11 @@ Commands:
 
 **5.1.** CLI for ProducerApp
 ```shell
-java -jar build/libs/kafka-stream-processing-1.0.jar producer
+# Native - requires GraalVM
+./build/native/nativeCompile/kotlin-sp producer
+
+# fatJar - Standard JDK
+java -jar build/libs/kotlin-sp-2.0.jar producer
 ```
 ```text
 Parse data from source dataset and publish as JSON to Kafka
@@ -61,7 +82,11 @@ Commands:
 ```
 
 ```shell
-java -jar build/libs/kafka-stream-processing-1.0.jar producer [green|yellow|fhv]
+# Native - requires GraalVM
+./build/native/nativeCompile/kotlin-sp producer [green|yellow|fhv]
+
+# fatJar - Standard JDK
+java -jar build/libs/kotlin-sp-2.0.jar producer [green|yellow|fhv]
 ```
 ```text
 Process [GreenTaxiDTO|YellowTaxiDTO|FhvTaxiDTO] data from CSV file and publish to Kafka topic
@@ -72,7 +97,11 @@ Process [GreenTaxiDTO|YellowTaxiDTO|FhvTaxiDTO] data from CSV file and publish t
 
 **5.2.** CLI for ConsumerApp
 ```shell
-java -jar build/libs/kafka-stream-processing-1.0.jar consumer
+# Native - requires GraalVM
+./build/native/nativeCompile/kotlin-sp consumer
+
+# fatJar - Standard JDK
+java -jar build/libs/kotlin-sp-2.0.jar consumer
 ```
 ```text
 Subscribe and consume records from Kafka topic
@@ -83,7 +112,11 @@ Commands:
 ```
 
 ```shell
-java -jar build/libs/kafka-stream-processing-1.0.jar consumer [green|yellow|fhv]
+# Native - requires GraalVM
+./build/native/nativeCompile/kotlin-sp consumer [green|yellow|fhv]
+
+# fatJar - Standard JDK
+java -jar build/libs/kotlin-sp-2.0.jar consumer [green|yellow|fhv]
 ```
 ```text
 Deserialize ConsumerRecords from source Kafka topic to [GreenTaxiDTO|YellowTaxiDTO|FhvTaxiDTO]
