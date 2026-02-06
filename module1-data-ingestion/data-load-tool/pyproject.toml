@@ -1,26 +1,50 @@
 [project]
-name = ""
-version = "1.0"
-description = "data load tool workshop"
-license = {text = "CC-BY-SA-4.0"}
+name = "dlt-playground"
+version = "2.0"
+description = "data load tool playground"
 readme = "README.md"
-authors = [
-    {name = "Bruno Oliveira", email = "bruno.ariev@gmail.com"},
-]
-
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.12,<3.14"
 
 dependencies = [
-    "dlt[duckdb]>=0.4.4",
-    "duckdb>=0.9.2,<1.0",
-    "pandas>=2.2.0,<3.0",
+    "dlt[duckdb]>=1.21.0,<2.0",
+    "duckdb>=1.4.4,<2.0",
+    "polars>=1.38.0,<2.0",
+    "pandas>=3.0,<4.0",
 ]
 
-[tool.pdm.dev-dependencies]
+[dependency-groups]
 dev = [
-    "ruff>=0.1.6",
-    "jupyterlab>=4.1.1",
+    "ruff>=0.15.0",
+    "jupyterlab>=4.5.3",
 ]
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+preview = true  # unstable: enables 'hug_parens_with_braces_and_square_brackets' for compact StructType([...])
+
+[tool.ruff.lint]
+preview = true  # unstable: enables latest lint rules before stabilization
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # Pyflakes
+    "I",    # isort (import sorting)
+    "UP",   # pyupgrade (modernize syntax for newer Python)
+    "B",    # flake8-bugbear (common bug patterns)
+    "SIM",  # flake8-simplify (code simplification)
+    "RUF",  # Ruff-specific rules
+]
+ignore = [
+    "E501",    # line too long (handled by formatter)
+    "RUF013",  # implicit Optional
+]
+fixable = ["ALL"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["E402"]  # allow imports not at top in notebooks
