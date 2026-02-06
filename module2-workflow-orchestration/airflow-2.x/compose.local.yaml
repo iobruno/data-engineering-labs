@@ -10,15 +10,23 @@ x-airflow-common:
   user: "${AIRFLOW_UID:-50000}:0"
   environment:
     &airflow-common-env
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    ### Core, Auth, Database & Scheduler ####
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-metastore/airflow
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-metastore/airflow
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+    ### XCOM with GCS backend (requires `apache-airflow-providers-google`) ###
+    AIRFLOW__CORE__XCOM_BACKEND: "airflow.providers.common.io.xcom.backend.XComObjectStorageBackend"
+    AIRFLOW__COMMON_IO__XCOM_OBJECTSTORAGE_PATH: "gs://iobruno-airflow-xcom-backend/xcom"
+    AIRFLOW__COMMON_IO__XCOM_OBJECTSTORAGE_THRESHOLD: "1048576" # (10 MiB)
+    AIRFLOW__COMMON_IO__XCOM_OBJECTSTORAGE_COMPRESSION: "zip"
+    GOOGLE_APPLICATION_CREDENTIALS: "/secrets/gcp_credentials.json"
   volumes:
+    - ~/.gcp/gcp_credentials.json:/secrets/gcp_credentials.json
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs

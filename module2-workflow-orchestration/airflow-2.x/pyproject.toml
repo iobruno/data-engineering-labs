@@ -1,17 +1,29 @@
 [project]
 name = "airflow2-playground"
 version = "1.0"
-description = "Workflow orchestration with Airflow 2.x"
+description = "Workflow orchestration with Airflow 2.10"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 
 dependencies = [
     "apache-airflow>=2.10,<2.11",                   # Pins to 2.x to prevent airflow-providers force-upgrading to 3.x
-    "sqlalchemy>=1.4.54,<2.0",                      # Airflow 2.x doesn't yet support SQLAlchemy 2.x
+    "sqlalchemy>=1.4,<2.0",                         # Airflow 2.x doesn't yet support SQLAlchemy 2.x
     "psycopg2-binary==2.9.11",                      # psycopg3 is only supported by SQLAlchemy 2.0+
+    "pandas>=3.0.0,<4.2.0",
+    "polars>=1.38.0,<2.0",
+    "pyarrow>=23.0,<24.0",
+    "adbc-driver-manager>=1.10.0,<2.0",
+    "adbc-driver-postgresql>=1.10.0,<2.0",
 ]
 
 [project.optional-dependencies]
+gcp = [
+    "apache-airflow-providers-google>=19.0,<19.1",  # Airflow 2.10
+]
+venv = [
+    "apache-airflow[virtualenv]>=2.10,<2.11",       # Required for PythonVirtualenvOperator
+    "cloudpickle>=3.1.2,<4.0",                      # Required for PythonVirtualenvOperator
+]
 celery = [
     "apache-airflow-providers-celery>=3.13,<3.14",  # required for CeleryExecutor / Airflow 2.10
     "apache-airflow-providers-redis>=4.3,<4.4",     # required for CeleryExecutor / Airflow 2.10
