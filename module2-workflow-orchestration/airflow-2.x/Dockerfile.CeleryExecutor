@@ -7,4 +7,4 @@ USER airflow
 RUN --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=README.md,target=README.md \
-    uv pip install ".[celery]"
+    uv pip install ".[gcp,celery]"
