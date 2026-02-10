@@ -53,7 +53,7 @@ select
     tt.payment_type_desc                        as payment_type_description
 from
     taxi_trips tt
-inner join 
+inner join
     lookup_zones pu on tt.pickup_location_id = pu.location_id
-inner join 
+inner join
     lookup_zones do on tt.dropoff_location_id = do.location_id

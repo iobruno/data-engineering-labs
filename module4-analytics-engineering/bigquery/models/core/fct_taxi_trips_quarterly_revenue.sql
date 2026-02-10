@@ -38,7 +38,3 @@ select
     round(safe_divide(revenue - prev_year_revenue, prev_year_revenue) * 100, 2) as growth
 from
     quarterly_trips_with_prev
-order by
-    service_type,
-    year desc,
-    quarter desc

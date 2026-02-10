@@ -17,9 +17,9 @@ select
     round(sum(improvement_surcharge), 2)         as improvement_surcharge,
     round(sum(congestion_surcharge), 2)          as congestion_surcharge,
     round(sum(total_amount), 2)                  as total_amount
-from 
+from
     {{ ref('dim_taxi_trips') }}
-group by 
-    pickup_zone, 
+group by
+    pickup_zone,
     service_type,
     {{ date_trunc("month", "pickup_datetime") }}

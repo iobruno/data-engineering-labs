@@ -42,5 +42,3 @@ select
     num_trips               as num_trips
 from
     fhv_rnk_timedelta
-order by
-    year, month, pickup_zone
