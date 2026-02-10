@@ -4,35 +4,41 @@
 
 with quarterly_trips as (
     select
-        service_type        as service_type,
+        service_type,
         pickup_year         as year,
         pickup_quarter      as quarter,
         count(1)            as num_trips,
         sum(total_amount)   as revenue
-    from 
+    from
         {{ ref('dim_taxi_trips') }}
-    group by 
-        service_type, 
-        year, 
+    group by
+        service_type,
+        year,
         quarter
+),
+
+quarterly_trips_with_prev as (
+    select
+        service_type,
+        year,
+        quarter,
+        num_trips,
+        round(revenue, 2)   as revenue,
+        lag(revenue) over (partition by service_type, quarter order by year) as prev_year_revenue
+    from
+        quarterly_trips
 )
 
-select 
-    cur.service_type                                            as service_type,
-    cur.year                                                    as year,
-    cur.quarter                                                 as quarter,
-    format("%'d", cur.num_trips)                                as num_trips,
-    format("%'.2f", round(cur.revenue, 2))                      as revenue,    
-    round(((cur.revenue - prev.revenue)/prev.revenue)*100, 10)  as growth
+select
+    service_type,
+    year,
+    quarter,
+    num_trips,
+    revenue,
+    round(safe_divide(revenue - prev_year_revenue, prev_year_revenue) * 100, 2) as growth
 from
-    quarterly_trips cur
-left join
-    quarterly_trips prev on (
-        cur.service_type = prev.service_type
-        and cur.quarter = prev.quarter
-        and (cur.year - 1) = prev.year
-    )
+    quarterly_trips_with_prev
 order by
-    cur.service_type,
-    cur.year desc,
-    cur.quarter desc
+    service_type,
+    year desc,
+    quarter desc

@@ -5,8 +5,8 @@
 select
     -- Revenue Grouping
     pickup_zone                                  as zone,
-    service_type                                 as service_type,
-    {{ date_trunc("month", "pickup_datetime") }} as order_year,
+    service_type,
+    {{ date_trunc("month", "pickup_datetime") }} as revenue_month,
     -- Revenue Calculations
     round(sum(fare_amount), 2)                   as fare,
     round(sum(extra), 2)                         as extra,
