@@ -163,24 +163,11 @@ ipython_config.py
 # Remove previous ipynb_checkpoints
 #   git rm -r .ipynb_checkpoints/
 
-### mage.ai Pipelines ###
-**/mage_data/**
-**/secrets/**
-**/.ssh_tunnel/**
-**/.variables/**
-**/.file_versions/**
-mage-ai.db
-.mage_temp_profiles
-.preferences.yaml
-
 ### dbt ###
 target/
 dbt_modules/
 dbt_packages/
 logs/
-
-### piperider ###
-.piperider/
 
 ### Kotlin ###
 # Compiled class file
@@ -281,17 +268,12 @@ terraform.rc
 *.vsix
 
 ### VisualStudioCode Patch ###
+
 # Ignore all local history of files
 .history
 .ionide
 
 ### Developer Workstation ###
-# Docker volumes
-**/volumes/**
-
-# GCP Crendeitals
-**/credentials/**
-
 # macOS
 **/.DS_Store
 
