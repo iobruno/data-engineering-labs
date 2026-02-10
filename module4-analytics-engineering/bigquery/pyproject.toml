@@ -3,18 +3,45 @@ name = "dbt-bigquery-analytics"
 version = "2.0"
 description = "Analytics engineering with dbt and BigQuery"
 readme = "README.md"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12,<3.14"
 
 dependencies = [
-    "dbt-core>=1.9.2,<2.0",
-    "dbt-bigquery>=1.9.1,<2.0",
+    "dbt-core>=1.11,<2.0",
+    "dbt-bigquery>=1.11,<2.0",
 ]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.9.4",
+    "ruff>=0.15",
 ]
 
 [tool.ruff]
 line-length = 100
-lint.select = ["F", "E", "W", "I001"]
+
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+preview = true  # unstable: enables 'hug_parens_with_braces_and_square_brackets' for compact StructType([...])
+
+[tool.ruff.lint]
+preview = true  # unstable: enables latest lint rules before stabilization
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # Pyflakes
+    "I",    # isort (import sorting)
+    "UP",   # pyupgrade (modernize syntax for newer Python)
+    "B",    # flake8-bugbear (common bug patterns)
+    "SIM",  # flake8-simplify (code simplification)
+    "RUF",  # Ruff-specific rules
+]
+ignore = [
+    "E501",    # line too long (handled by formatter)
+    "RUF013",  # implicit Optional
+]
+fixable = ["ALL"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["E402"]  # allow imports not at top in notebooks

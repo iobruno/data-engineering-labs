@@ -6,7 +6,7 @@ select
     -- Revenue Grouping
     pickup_zone                                  as zone,
     service_type                                 as service_type,
-    {{ date_trunc("month", "pickup_datetime") }} as order_year,
+    {{ date_trunc("month", "pickup_datetime") }} as revenue_month,
     -- Revenue Calculations
     round(sum(fare_amount), 2)                   as fare,
     round(sum(extra), 2)                         as extra,
@@ -17,9 +17,9 @@ select
     round(sum(improvement_surcharge), 2)         as improvement_surcharge,
     round(sum(congestion_surcharge), 2)          as congestion_surcharge,
     round(sum(total_amount), 2)                  as total_amount
-from 
+from
     {{ ref('dim_taxi_trips') }}
-group by 
-    pickup_zone, 
+group by
+    pickup_zone,
     service_type,
     {{ date_trunc("month", "pickup_datetime") }}
