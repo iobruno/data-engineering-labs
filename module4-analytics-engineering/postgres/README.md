@@ -55,23 +55,18 @@ export DBT_POSTGRES_PASSWORD=postgres
 dbt deps
 ```
 
-4.2. Run `dbt seed` to push/create the tables from the .csv seed files to the target schema
+4.2. Run dbt build to trigger the dbt models to run
 ```shell
-dbt seed
-```
-
-4.3. Run dbt run to trigger the dbt models to run
-```shell
-dbt build --target [prod|dev]
+dbt build
 
 # Alternatively you can run only a subset of the models with:
 
 ## +models/staging: Runs the dependencies/preceding models first that lead 
 ## to 'models/staging', and then the target models
-dbt [build|run] --select +models/staging --target [prod|dev]
+dbt [build|run] --select +models/staging
 
 ## models/staging+: Runs the target models first, and then all models that depend on it
-dbt [build|run] --select models/staging+ --target [prod|dev]
+dbt [build|run] --select models/staging+
 ```
 
 **5.** Generate the Docs and the Data Lineage graph with:
