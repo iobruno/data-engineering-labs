@@ -3,7 +3,7 @@ name = "dbt-duckdb-analytics"
 version = "2.0"
 description = "Analytics engineering with dbt and duckdb"
 readme = "README.md"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12,<3.14"
 
 dependencies = [
     "duckdb>=1.4.4,<2.0",
