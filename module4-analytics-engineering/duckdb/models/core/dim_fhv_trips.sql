@@ -20,9 +20,9 @@ select
     pu.service_zone                             as pickup_service_zone,
 
     ft.dropoff_location_id                      as dropoff_location_id,
-    do.borough                                  as dropoff_borough,
-    do.zone                                     as dropoff_zone,
-    do.service_zone                             as dropoff_service_zone,
+    "do".borough                                as dropoff_borough,
+    "do".zone                                   as dropoff_zone,
+    "do".service_zone                           as dropoff_service_zone,
 
     ft.pickup_datetime                          as pickup_datetime,
     extract(year from ft.pickup_datetime)       as pickup_year,
@@ -38,4 +38,4 @@ from
 inner join
     lookup_zones pu on ft.pickup_location_id = pu.location_id
 inner join
-    lookup_zones do on ft.dropoff_location_id = do.location_id
+    lookup_zones "do" on ft.dropoff_location_id = "do".location_id

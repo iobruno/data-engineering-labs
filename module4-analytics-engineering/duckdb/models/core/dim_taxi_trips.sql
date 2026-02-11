@@ -29,8 +29,8 @@ select
     extract(month from tt.pickup_datetime)      as pickup_month,
 
     tt.dropoff_location_id                      as dropoff_location_id,
-    do.borough                                  as dropoff_borough,
-    do.zone                                     as dropoff_zone,
+    "do".borough                                as dropoff_borough,
+    "do".zone                                   as dropoff_zone,
     tt.dropoff_datetime                         as dropoff_datetime,
     extract(year from tt.dropoff_datetime)      as dropoff_year,
     extract(quarter from tt.dropoff_datetime)   as dropoff_quarter,
@@ -56,4 +56,4 @@ from
 inner join
     lookup_zones pu on tt.pickup_location_id = pu.location_id
 inner join
-    lookup_zones do on tt.dropoff_location_id = do.location_id
+    lookup_zones "do" on tt.dropoff_location_id = "do".location_id
