@@ -8,9 +8,9 @@ with fare_percentile as (
         pickup_year                 as year,
         pickup_month                as month,
         fare_amount                 as fare_amount,
-        percentile_disc(fare_amount, 0.97) over (partition by service_type, pickup_year, pickup_month) as p97,
-        percentile_disc(fare_amount, 0.95) over (partition by service_type, pickup_year, pickup_month) as p95,
-        percentile_disc(fare_amount, 0.90) over (partition by service_type, pickup_year, pickup_month) as p90
+        quantile_disc(fare_amount, 0.97) over (partition by service_type, pickup_year, pickup_month) as p97,
+        quantile_disc(fare_amount, 0.95) over (partition by service_type, pickup_year, pickup_month) as p95,
+        quantile_disc(fare_amount, 0.90) over (partition by service_type, pickup_year, pickup_month) as p90
     from
         {{ ref('dim_taxi_trips') }}
     where

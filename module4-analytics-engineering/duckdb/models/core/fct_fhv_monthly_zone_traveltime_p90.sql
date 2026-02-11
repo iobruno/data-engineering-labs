@@ -8,7 +8,7 @@ with fhv_timedelta as (
         pickup_month        as month,
         pickup_zone         as pickup_zone,
         dropoff_zone        as dropoff_zone,
-        percentile_cont(timestamp_diff(dropoff_datetime, pickup_datetime, SECOND), 0.90)
+        quantile_cont(datediff('second', pickup_datetime, dropoff_datetime), 0.90)
             over (partition by pickup_year, pickup_month, pickup_zone, dropoff_zone) as timedelta_p90
     from
         {{ ref('dim_fhv_trips') }}
