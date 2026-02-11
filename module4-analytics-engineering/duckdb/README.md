@@ -7,8 +7,7 @@
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
 
-This project is meant for experimenting with `dbt` and the `dbt-duckdb` adapter for Analytics,
-using [NYC TLC Trip Record](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) dataset as the datasource, with Kimball dimensional modeling technique. 
+Analytics engineering project built with [`dbt`](https://docs.getdbt.com) and the [`dbt-duckdb`](https://docs.getdbt.com/docs/core/connect-data-platform/duckdb-setup) adapter that transforms [NYC TLC Trip Record](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) Parquet data into a Kimball dimensional model — from raw ingestion through staging views to materialized dimensions and fact tables covering zone-level revenue, fare percentiles, travel time distributions, and year-over-year growth across Yellow Taxi, Green Taxi, and For-Hire Vehicle services. Supports sourcing data from GCS, S3, or local filesystem.
 
 
 ## Getting Started
