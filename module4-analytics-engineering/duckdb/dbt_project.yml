@@ -24,7 +24,7 @@ clean-targets:
 # directory as views. These settings can be overridden in the individual model
 # files using the `{{ config(...) }}` macro.
 models:
-  dbt_bigquery_analytics:
+  dbt_duckdb_analytics:
     staging:
       +materialized: view
     core:
