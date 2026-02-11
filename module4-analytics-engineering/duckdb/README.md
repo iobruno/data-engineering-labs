@@ -34,30 +34,42 @@ mkdir -p ~/.dbt/
 cat profiles.tmpl.yml >> ~/.dbt/profiles.yml
 ```
 
-3.2. Set the environment variables for `dbt-duckdb`:
-```shell
-export DBT_DUCKDB_SOURCE_PARQUET_BASE_PATH="gs://iobruno-lakehouse-raw/nyc_tlc_dataset/"
-export DBT_DUCKDB_TARGET_PATH=~/.duckdb/dbt.duckdb
-```
+3.2. Set the auth methods (when appliable) and the ENV variables for DuckDB source and destination:
 
-Optionally, you can also set the DuckDB schemas where the dbt staging & core models should land on:
-```shell
-# Schema for the dim_ and fct_ models; it defaults to 'main', when not set
-export DBT_DUCKDB_TARGET_SCHEMA=analytics
-
-# Schema for the stg_ models; it defaults to 'main', when not set
-export DBT_DUCKDB_STAGING_SCHEMA=stg_analytics
-```
-
-3.3. If you're reading data from gcs, authenticate with:
+**Google Cloud Storage (gcsfs)** - when attempting to read data from `gcs`, first you must authenticate with:
 ```shell
 gcloud auth login
 ```
+```shell
+export DBT_DUCKDB_SOURCE_PARQUET_BASE_PATH="gs://iobruno-lakehouse-raw/nyc_tlc_dataset/"
+```
 
-3.4. Additionally, If you're reading data from s3, make sure to set `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY`:
+**AWS S3 (s3fs)** - when attempting to read data from `s3`, first you must set these AWS ENV VARS:
 ```shell
 export AWS_ACCESS_KEY=
 export AWS_SECRET_ACCESS_KEY=
+```
+```shell
+export DBT_DUCKDB_SOURCE_PARQUET_BASE_PATH="s3://iobruno-lakehouse-raw/nyc_tlc_dataset/"
+```
+
+**Local FS** - no additional config required
+```shell
+export DBT_DUCKDB_SOURCE_PARQUET_BASE_PATH="fs://iobruno-lakehouse-raw/nyc_tlc_dataset/"
+```
+
+3.3. Set the env var for where DuckDB should store its internal data
+```shell
+export DBT_DUCKDB_TARGET_PATH=~/.duckdb/dbt.duckdb
+```
+
+3.4. (Optional) you can also set the DuckDB schemas where the dbt staging & core models should land on:
+```shell
+# DuckDB schema for the `dim_` and `fct_ models` - defaults to 'main' if not set
+export DBT_DUCKDB_TARGET_SCHEMA=analytics
+
+# DuckDB for the stg_ models - defaults to 'main' if not set
+export DBT_DUCKDB_STAGING_SCHEMA=stg_analytics
 ```
 
 **4.** Install dbt dependencies and trigger the pipeline
@@ -111,8 +123,6 @@ docker run -d --rm \
   --name dbt-duckdb \
   dbt-duckdb
 ```
-
-Note: If the container suddenly gets killed, it means it has run out-of-ram to process the full workload. Increase the amount of available RAM a container can use (on Docker settings).
 
 
 ## TODO's:
