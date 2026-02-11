@@ -26,6 +26,6 @@ clean-targets:
 models:
   dbt_duckdb_analytics:
     staging:
-      materialized: table
+      +materialized: view
     core:
-      materialized: table
+      +materialized: table

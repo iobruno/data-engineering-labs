@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: nyc_tlc_dataset_parquet
+  - name: raw_nyc_tlc_record_data
     meta:
       external_location: "{{ env_var('DBT_DUCKDB_SOURCE_PARQUET_BASE_PATH') ~ '{name}/*.parquet' }}"
     tables:
