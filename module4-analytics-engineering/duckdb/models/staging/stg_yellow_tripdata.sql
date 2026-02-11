@@ -34,7 +34,7 @@ select
     payment_type                         as payment_type,
     {{ payment_desc_of('payment_type')}} as payment_type_desc
 from
-    {{ source('raw_nyc_tlc_record_data', 'ext_yellow_taxi') }}
+    {{ source('raw_nyc_tlc_record_data', 'yellow_trip_data') }}
 where
     VendorID is not null
 qualify

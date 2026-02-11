@@ -19,7 +19,7 @@ select
     DOlocationID           as dropoff_location_id,
     SR_Flag                as shared_ride_flag
 from
-    {{ source('raw_nyc_tlc_record_data', 'ext_fhv') }}
+    {{ source('raw_nyc_tlc_record_data', 'fhv_trip_data') }}
 where
     dispatching_base_num is not null
 qualify
