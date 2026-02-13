@@ -2,26 +2,30 @@ x-spark-image: &spark-image spark:${SPARK_VERSION:-4.0.1-scala2.13-java21-python
 x-hive-image:  &hive-image  apache/hive:${HIVE_VERSION:-4.2.0}
 x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
 
+x-spark-common:
+  &spark-common
+  image: *spark-image
+  environment: &spark-common-env
+    SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
+  volumes: &spark-common-vol
+    - vol-spark-extra-jars:/opt/spark/extra-jars/
+    - ./spark-4.0-standalone.conf:/opt/spark/conf/spark-standalone.conf
+    - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
+
 services:
   spark-master:
-    image: *spark-image
+    <<: *spark-common
     container_name: spark-master
     command: |
       /opt/spark/sbin/start-master.sh
       --properties-file /opt/spark/conf/spark-standalone.conf      
-    environment:
-      SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
     ports:
-      - '4040:8080'               # Spark Master WebUI port (4040 → 8080 in Spark 4.x)
+      - '4040:8080'   # Spark Master WebUI port (4040 → 8080 in Spark 4.x)
       - '7077:7077'
-    volumes:
-      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
-      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
-      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
-    restart: on-failure
+    restart: on-failure:5
 
   spark-worker1:
-    image: *spark-image
+    <<: *spark-common
     container_name: spark-worker1
     command: > 
       /opt/spark/sbin/start-worker.sh 
@@ -29,21 +33,15 @@ services:
       --cores 2
       --memory 4G
       --properties-file /opt/spark/conf/spark-standalone.conf
-    environment:
-      SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
     ports:
-      - '4041:8081'               # Spark Worker WebUI port (4041 → 8081 in Spark 4.x)
-    volumes:
-      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
-      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
-      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
+      - '4041:8081'   # Spark Worker WebUI port (4041 → 8081 in Spark 4.x)
     depends_on:
       spark-master:
         condition: service_started
-    restart: on-failure
+    restart: on-failure:5
 
   spark-worker2:
-    image: *spark-image
+    <<: *spark-common
     container_name: spark-worker2
     command: > 
       /opt/spark/sbin/start-worker.sh 
@@ -51,93 +49,81 @@ services:
       --cores 4
       --memory 6G
       --properties-file /opt/spark/conf/spark-standalone.conf
-    environment:
-      SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
     ports:
-      - '4042:8081'               # Spark Worker WebUI port (4042 → 8081 in Spark 4.x)
-    volumes:
-      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
-      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
-      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
+      - '4042:8081'   # Spark Worker WebUI port (4042 → 8081 in Spark 4.x)
     depends_on:
       spark-master:
         condition: service_started
-    restart: on-failure
+    restart: on-failure:5
 
   spark-connect:
-    image: *spark-image
+    <<: *spark-common
     container_name: spark-connect
     command: |
       /opt/spark/sbin/start-connect-server.sh
       --master spark://spark-master:7077
       --properties-file /opt/spark/conf/spark-standalone.conf
       --jars /opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
-    environment:
-      SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
     ports:
       - '15002:15002'
     depends_on:
       spark-master:
         condition: service_started
-    volumes:
-      - /tmp/spark_jars/gcs-connector-latest-hadoop2.jar:/opt/spark/extra-jars/gcs-connector-latest-hadoop2.jar
-      - ./spark-standalone.conf:/opt/spark/conf/spark-standalone.conf
-      - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
-    restart: on-failure
+    restart: on-failure:3
 
-  hive-db:
-    image: *postgres-image
-    container_name: hive-metastore-db
-    environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
-      POSTGRES_DB: 'metastore'
-    ports:
-      - '5433:5432'
-    volumes:
-      - vol-hive-db:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: on-failure
+  # hive-db:
+  #   image: *postgres-image
+  #   container_name: hive-metastore-db
+  #   environment:
+  #     POSTGRES_USER: 'postgres'
+  #     POSTGRES_PASSWORD: 'postgres'
+  #     POSTGRES_DB: 'metastore'
+  #   ports:
+  #     - '5433:5432'
+  #   volumes:
+  #     - vol-hive-db:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  #   restart: on-failure
 
-  hive-metastore:
-    image: *hive-image
-    container_name: hive-metastore
-    environment:
-      SERVICE_NAME: 'metastore'
-      SERVICE_OPTS: |-
-        -Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver
-        -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://hive-db:5432/metastore
-        -Djavax.jdo.option.ConnectionUserName=postgres
-        -Djavax.jdo.option.ConnectionPassword=postgres
-      HIVE_AUX_JARS_PATH: /opt/hive/aux_jars/
-      DB_DRIVER: 'postgres'
-    ports:
-      - '9083:9083'
-    depends_on:
-      hive-db:
-        condition: service_healthy
-      hive-init:
-        condition: service_completed_successfully
-    volumes:
-      - vol-hive-warehouse:/opt/hive/data/warehouse
-      - vol-hive-auxjars:/opt/hive/aux_jars/
+  # hive-metastore:
+  #   image: *hive-image
+  #   container_name: hive-metastore
+  #   environment:
+  #     SERVICE_NAME: 'metastore'
+  #     SERVICE_OPTS: |-
+  #       -Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver
+  #       -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://hive-db:5432/metastore
+  #       -Djavax.jdo.option.ConnectionUserName=postgres
+  #       -Djavax.jdo.option.ConnectionPassword=postgres
+  #     HIVE_AUX_JARS_PATH: /opt/hive/aux_jars/
+  #     DB_DRIVER: 'postgres'
+  #   ports:
+  #     - '9083:9083'
+  #   depends_on:
+  #     hive-db:
+  #       condition: service_healthy
+  #     hive-init:
+  #       condition: service_completed_successfully
+  #   volumes:
+  #     - vol-hive-warehouse:/opt/hive/data/warehouse
+  #     - vol-hive-auxjars:/opt/hive/aux_jars/
 
-  hive-init:
-    image: *hive-image
-    container_name: hive-init
-    user: 0:0
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        apt update && apt install curl -y
-        curl --create-dirs -O --output-dir /tmp/aux_jars https://jdbc.postgresql.org/download/postgresql-42.7.1.jar
-    volumes:
-      - vol-hive-auxjars:/tmp/aux_jars
+  # hive-init:
+  #   image: *hive-image
+  #   container_name: hive-init
+  #   user: 0:0
+  #   entrypoint: /bin/bash
+  #   command:
+  #     - -c
+  #     - |
+  #       apt update && apt install curl -y
+  #       curl --create-dirs -O --output-dir /tmp/aux_jars https://jdbc.postgresql.org/download/postgresql-42.7.1.jar
+  #   volumes:
+  #     - vol-hive-auxjars:/tmp/aux_jars
 
 volumes:
   vol-spark-extra-jars:
