@@ -1,5 +1,5 @@
 [project]
-name = "pyspark-batch"
+name = "pyspark-4.0-pipeline"
 version = "2.0"
 description = "Batch processing with PySpark 4"
 readme = "README.md"
@@ -13,7 +13,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff>=0.14.14",
+    "ruff>=0.15",
     "jupyterlab>=4.5.3",
 ]
 

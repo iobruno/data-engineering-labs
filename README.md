@@ -32,7 +32,7 @@ Refer to the modules below for covered topics and tools.
 * [Data visualization with Superset/Metabase](./module4-analytics-engineering/visualization/)
 
 ### [Module 5: Batch processing](./module5-batch-processing/)
-* [PySpark](./module5-batch-processing/pyspark/)
+* [PySpark 4.x](./module5-batch-processing/pyspark-4.x/)
 * Spark + Kotlin API
 * Spark (Scala)
 
