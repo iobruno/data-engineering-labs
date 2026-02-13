@@ -1126,7 +1126,7 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ae/40/1414582f16c1d7b051c668c2e19c62d21a18bd181d944cb24f5ddbb2423f/pyspark-4.0.1.tar.gz", hash = "sha256:9d1f22d994f60369228397e3479003ffe2dd736ba79165003246ff7bd48e2c73", size = 434204896, upload-time = "2025-09-06T07:15:57.091Z" }
 
 [[package]]
-name = "pyspark-batch"
+name = "pyspark-4-0-pipeline"
 version = "2.0"
 source = { virtual = "." }
 dependencies = [

@@ -1,5 +1,5 @@
 [project]
-name = "pyspark-batch"
+name = "pyspark-4.0-pipeline"
 version = "2.0"
 description = "Batch processing with PySpark 4"
 readme = "README.md"
