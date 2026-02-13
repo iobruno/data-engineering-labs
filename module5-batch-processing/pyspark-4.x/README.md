@@ -1,7 +1,8 @@
 # Batch processing with PySpark 4.x
 
 ![Python](https://img.shields.io/badge/Python-3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
-[![PySpark](https://img.shields.io/badge/PySpark-4.0-262A38?style=flat-square&logo=apachespark&logoColor=E36B22&labelColor=262A38)](https://spark.apache.org/docs/4.0.2/api/python/user_guide)
+[![PySpark](https://img.shields.io/badge/PySpark-4.x-262A38?style=flat-square&logo=apachespark&logoColor=E36B22&labelColor=262A38)](https://spark.apache.org/docs/4.0.2/api/python/user_guide)
+[![Hadoop](https://img.shields.io/badge/Hadoop-3.4.x-262A38?style=flat-square&logo=apachehadoop&logoColor=FDEE21&labelColor=262A38)](https://spark.apache.org/docs/4.0.2/api/python/user_guide)
 [![Scala](https://img.shields.io/badge/Scala-2.13-262A38?style=flat-square&logo=scala&logoColor=E03E3C&labelColor=262A38)](https://sdkman.io/usage/)
 [![JDK](https://img.shields.io/badge/JDK-21_|_17-35667C?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1D213B)](https://sdkman.io/usage/)
 [![uv](https://img.shields.io/badge/astral/uv-261230?style=flat&logo=uv&logoColor=DE5FE9&labelColor=261230)](https://docs.astral.sh/uv/getting-started/installation/)
@@ -9,20 +10,6 @@
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
 
-```
-Welcome to
-      ____              __
-     / __/__  ___ _____/ /__
-    _\ \/ _ \/ _ `/ __/  '_/
-   /__ / .__/\_,_/_/ /_/\_\   version 4.0.1
-      /_/
-
-Using Python version 3.13.11 (main, Jan 14 2026 23:37:46)
-Spark context Web UI available at http://192.168.15.5:4043
-Spark context available as 'sc' (master = local[*], app id = local-1769554629678).
-SparkSession available as 'spark'.
-Cmd click to launch VS Code Native REPL
-```
 
 ## Getting Started
 
@@ -49,6 +36,38 @@ pre-commit install
 ```shell
 docker compose -f ../compose.yaml up -d
 ```
+
+
+## Compatibility Matrix for GCS
+
+### Spark 4.x, Hadoop, and GCS Connector
+
+| Spark | Bundled Hadoop | GCS Connector | Status |
+|-------|---------------|---------------|--------|
+| 4.0.x | 3.4.1 | `gcs-connector-4.0.x-shaded.jar` | ✅ Recommended. Built against Hadoop 3.4.2. |
+| 4.0.x | 3.4.1 | `gcs-connector-3.1.x-shaded.jar` | ⚠️ Compatible, but targets Hadoop 3.3.5. |
+| 4.0.x | 3.4.1 | `gcs-connector-hadoop3-2.2.x-shaded.jar` | ⚠️ Works, but uses legacy auth config and misses `openFile` optimization. |
+| 4.0.x | 3.4.1 | `gcs-connector-hadoop2-*-shaded.jar` | ❌ Do not use. Hadoop 2.x only. |
+
+### Auth Configuration
+
+The auth properties changed in GCS Connector 3.0.0:
+
+| Connector | Auth Type | Keyfile Path |
+|-----------|-----------|-------------|
+| 4.x / 3.x | `google.cloud.auth.type=SERVICE_ACCOUNT_JSON_KEYFILE` | `google.cloud.auth.service.account.json.keyfile` |
+| 2.2.x | `fs.gs.auth.service.account.enable=true` | `fs.gs.auth.service.account.json.keyfile` |
+
+> **Note:** In Spark config files, all Hadoop properties must be prefixed with `spark.hadoop.`.
+> The `fs.gs.impl` and `fs.AbstractFileSystem.gs.impl` properties are unchanged across all versions.
+
+### Breaking Changes
+
+| Version | Change |
+|---------|--------|
+| 4.0.0 | Added `listStatusStartingFrom` API. Bumped Hadoop target to 3.4.2. |
+| 3.0.0 | Dropped Hadoop 2.x. Moved auth from `fs.gs.auth.*` to `google.cloud.auth.*`. Added `FileSystem.openFile` (requires Hadoop 3.4+). Merged output streams into `FLUSHABLE_COMPOSITE`. Removed Cooperative Locking. |
+
 
 ## TODO's:
 - [x] PEP-517: Packaging and dependency management with `uv`
