@@ -48,6 +48,8 @@ services:
     depends_on:
       metabase-db:
         condition: service_healthy
+      metabase-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://localhost:3000/api/health"]
       interval: 5s
@@ -91,6 +93,18 @@ services:
       metabase:
         condition: service_healthy
     restart: "no"
+
+  metabase-init:
+    <<: *metabase-common
+    container_name: metabase-init
+    user: "0:0"
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p $${MB_PLUGINS_DIR}
+        curl -L -o $${MB_PLUGINS_DIR}/clickhouse.metabase-driver.jar https://github.com/motherduckdb/metabase_duckdb_driver/releases/download/1.4.3.1/duckdb.metabase-driver.jar
+        chown -R $${MUID}:$${MGID} $${MB_PLUGINS_DIR}
 
 volumes:
   vol-metabase-db:
