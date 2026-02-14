@@ -19,9 +19,9 @@ docker compose -f compose.metabase.yaml up -d
 
 **2.** Additional database drivers:
 
-Metabase supports a wide-variety of data sources out-of-the-box (BigQuery, RedShift, Snowflake, Spark SQL, Druid, PostgreSQL, MySQL, among others). The complete list of supported data sources can be found [here](https://www.metabase.com/data_sources/).
+Metabase supports a wide-variety of data sources out-of-the-box (BigQuery, Snowflake, ClickHouse, Starbust/Trino, Redshift, Spark SQL, Druid, PostgreSQL, MySQL, among others). The complete list of supported data sources can be found [here](https://www.metabase.com/data_sources/)
 
-For Partners Data Sources and Community Data Source connectors, such as `ClickHouse`, however, additional JDBC drivers have to be downloaded and put in the `plugins` folders, which is exactly what the `metabase-init` container is for.
+For Partners' and Community Data Sources, (such as ClickHouse, prior to v54.1), the additional JDBC drivers  must be downloaded into the `plugins` folder (default: `/app/plugins`)
 
 
 **3.** After the `metabase-app` container is in a healthy state, you can acccess Metabase at:
