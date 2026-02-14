@@ -1,0 +1,93 @@
+x-spark-image: &spark-image spark:${SPARK_VERSION:-3.5.7-scala2.12-java17-python3-ubuntu}
+
+x-spark-common:
+  &spark-common
+  image: *spark-image
+  environment:
+    &spark-common-env
+    SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
+  volumes:
+    &spark-common-vol
+    - vol-spark-extra-jars:/opt/spark/extra-jars/
+    - ./spark-3.5-standalone.conf:/opt/spark/conf/spark-standalone.conf
+    - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
+  depends_on:
+    &spark-common-depends-on
+    spark-init:
+      condition: service_completed_successfully
+
+services:
+  spark-master:
+    <<: *spark-common
+    container_name: spark-master
+    command: |
+      /opt/spark/sbin/start-master.sh
+      --properties-file /opt/spark/conf/spark-standalone.conf      
+    ports:
+      - '4040:8080'   # Spark Master WebUI port (4040 → 8080 in Spark 4.x)
+      - '7077:7077'
+    restart: on-failure:5
+
+  spark-worker1:
+    <<: *spark-common
+    container_name: spark-worker1
+    command: > 
+      /opt/spark/sbin/start-worker.sh 
+      spark://spark-master:7077 
+      --cores 2
+      --memory 4G
+      --properties-file /opt/spark/conf/spark-standalone.conf
+    ports:
+      - '4041:8081'   # Spark Worker WebUI port (4041 → 8081 in Spark 4.x)
+    depends_on:
+      spark-master:
+        condition: service_started
+    restart: on-failure:5
+
+  spark-worker2:
+    <<: *spark-common
+    container_name: spark-worker2
+    command: > 
+      /opt/spark/sbin/start-worker.sh 
+      spark://spark-master:7077 
+      --cores 4
+      --memory 6G
+      --properties-file /opt/spark/conf/spark-standalone.conf
+    ports:
+      - '4042:8081'   # Spark Worker WebUI port (4042 → 8081 in Spark 4.x)
+    depends_on:
+      spark-master:
+        condition: service_started
+    restart: on-failure:5
+
+  spark-connect:
+    <<: *spark-common
+    container_name: spark-connect
+    command: |
+      /opt/spark/sbin/start-connect-server.sh
+      --master spark://spark-master:7077
+      --properties-file /opt/spark/conf/spark-standalone.conf
+    ports:
+      - '15002:15002'
+    depends_on:
+      spark-master:
+        condition: service_started
+    restart: on-failure:3
+
+  spark-init:
+    image: *spark-image
+    container_name: spark-init
+    user: 0:0
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        apt-get update && apt-get install curl -y
+        curl --create-dirs -O --output-dir /opt/spark/extra-jars/ https://repo1.maven.org/maven2/com/google/cloud/bigdataoss/gcs-connector/hadoop3-2.2.32/gcs-connector-hadoop3-2.2.32-shaded.jar
+    volumes:
+      - vol-spark-extra-jars:/opt/spark/extra-jars/
+
+
+volumes:
+  vol-spark-extra-jars:
+    name: vol-spark-extra-jars
