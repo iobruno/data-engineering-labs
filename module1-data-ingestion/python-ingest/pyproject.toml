@@ -1,7 +1,5 @@
 [build-system]
-requires = [
-    "hatchling>=1.27.0,<2.0",
-]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
@@ -12,22 +10,22 @@ readme = "README.md"
 requires-python = ">=3.12,<3.15"
 
 dependencies = [
-    "typer>=0.21.1,<1.0",
-    "polars>=1.37.1,<2.0",
+    "typer>=0.23.1,<1.0",
+    "polars>=1.38.1,<2.0",
     "pandas>=3.0.0,<4.0",
     "pyarrow>=23.0.0,<24.0",
     "adbc-driver-postgresql>=1.10.0,<2.0",
     "adbc-driver-manager>=1.10.0,<2.0",
     "psycopg[binary]>=3.3.2,<4.0",
     "sqlalchemy>=2.0.46,<3.0",
+    "python-box[yaml]>=7.3.2,<8.0",
     "loguru>=0.7.3,<1.0",
-    "python-box[yaml]>=7.0,<8.0",
 ]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.14.14",
-    "jupyterlab>=4.5.3",
+    "ruff>=0.15",
+    "jupyterlab>=4.5.4",
 ]
 
 [project.scripts]
