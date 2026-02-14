@@ -1,5 +1,6 @@
 x-metabase-image: &metabase-image metabase/metabase:${METABASE_VERSION:-v0.58.x}
 x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
+x-metabase-setup-image: &metabase-setup-image curlimages/curl:${CURL_VERSION:-latest}
 
 x-metabase-common: &metabase-common
   image: *metabase-image
@@ -12,6 +13,8 @@ x-metabase-common: &metabase-common
     MB_DB_USER: metabase
     MB_DB_PASS: metabase
     MB_PLUGINS_DIR: ${MB_PLUGINS_DIR:-/app/plugins}
+    MB_PASSWORD_LENGTH: 4
+    MB_PASSWORD_COMPLEXITY: weak
     MUID: ${MUID:-2000}
     MGID: ${MGID:-2000}
   volumes:
@@ -50,7 +53,44 @@ services:
       interval: 5s
       timeout: 10s
       retries: 5
-    restart: on-failure
+    restart: on-failure:5
+
+  metabase-setup:
+    image: *metabase-setup-image
+    container_name: metabase-setup
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        TOKEN=$$(curl -sf http://metabase:3000/api/session/properties | grep -o '"setup-token":"[^"]*"' | cut -d'"' -f4)
+        if [ -z "$$TOKEN" ] || [ "$$TOKEN" = "null" ]; then
+          echo "Metabase already configured, skipping setup"
+          exit 0
+        fi
+
+        echo "Setting up Metabase admin user..."
+        curl -sf -X POST http://metabase:3000/api/setup \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "token": "'"$$TOKEN"'",
+            "user": {
+              "first_name": "Admin",
+              "last_name": "Metabase",
+              "email": "admin@metabase.local",
+              "password": "admin",
+              "password_confirm": "admin"
+            },
+            "prefs": {
+              "site_name": "Metabase",
+              "site_locale": "en_US",
+              "allow_tracking": false
+            }
+          }' && echo ""
+          
+          echo "Metabase setup complete!"
+    depends_on:
+      metabase:
+        condition: service_healthy
+    restart: "no"
 
 volumes:
   vol-metabase-db:

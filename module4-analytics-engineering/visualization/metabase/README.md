@@ -1,36 +1,43 @@
-# Data visualization with Superset and Metabase
+# Data visualization with Metabase
 
-[![Metabase](https://img.shields.io/badge/Metabase-509EE3?style=flat&logo=metabase&logoColor=white&labelColor=65A9E7)](https://github.com/metabase/metabase)
-[![BigQuery](https://img.shields.io/badge/BigQuery-3772FF?style=flat&logo=googlebigquery&logoColor=white&labelColor=3772FF)](https://console.cloud.google.com/bigquery)
-[![Redshift](https://img.shields.io/badge/Redshift_Serverless-2766A7?style=flat&logo=Amazon%20RedShift&logoColor=white&labelColor=2766A7)](https://aws.amazon.com/pt/redshift/redshift-serverless/)
-[![ClickHouse](https://img.shields.io/badge/ClickHouse-151515?style=flat&logo=clickhouse&logoColor=FBFD73&labelColor=151515)](https://clickhouse.com/docs/en/install)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat&logo=postgresql&logoColor=white&labelColor=336791)](https://hub.docker.com/_/postgres)
+[![Metabase](https://img.shields.io/badge/Metabase-509EE3?style=flat&logo=metabase&logoColor=white&labelColor=509EE3)](https://github.com/metabase/metabase)
+[![BigQuery](https://img.shields.io/badge/BigQuery-262A38?style=flat&logo=googlebigquery&logoColor=white&labelColor=3772FF)](https://console.cloud.google.com/bigquery)
+[![Snowflake](https://img.shields.io/badge/Snowflake-262A38?style=flat&logo=snowflake&logoColor=white&labelColor=249EDC)](https://console.cloud.google.com/bigquery)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-262A38?style=flat&logo=postgresql&logoColor=white&labelColor=336791)](https://hub.docker.com/_/postgres)
+[![ClickHouse](https://img.shields.io/badge/ClickHouse-262A38?style=flat&logo=clickhouse&logoColor=FFFFFF&labelColor=262A38)](https://clickhouse.com/docs/en/install)
+[![DuckDB](https://img.shields.io/badge/DuckDB-262A38?style=flat&logo=duckdb&logoColor=FEF000&labelColor=262A38)](https://duckdb.org/docs/)
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
 
 
 ## Getting Started
 
-**1.** Spin up Metabase infrastructure with:
+**1.** Start off by spinning Metabase up:
 
 ```shell
-docker compose -f compose.metabase.yaml up -d
+docker compose up -d
 ```
 
-**2.** Additional database drivers:
+**2.** Metabase Initial Setup
 
-Metabase supports a wide-variety of data sources out-of-the-box (BigQuery, Snowflake, ClickHouse, Starbust/Trino, Redshift, Spark SQL, Druid, PostgreSQL, MySQL, among others). The complete list of supported data sources can be found [here](https://www.metabase.com/data_sources/)
+After the `metabase` container is in a healthy state, the `metabase-setup` sidecar automatically creates the admin user (skipping the UI wizard).  You can access Metabase at:
 
-For Partners' and Community Data Sources, (such as ClickHouse, prior to v54.1), the additional JDBC drivers  must be downloaded into the `plugins` folder (default: `/app/plugins`)
-
-
-**3.** After the `metabase-app` container is in a healthy state, you can acccess Metabase at:
 ```shell
 open http://localhost:3000/
 ```
+```txt
+Email: admin@metabase.local
+Password: admin
+```
 
 
-## TODO's:
+## Metabase additional drivers
+
+Metabase ships with a wide variety [**Official Connectors**](https://www.metabase.com/data_sources/) out-of-the box, including BigQuery, Snowflake, ClickHouse, Starburst/Trino, etc.
+
+For  **Community Connectors**, such as [**DuckDB**](https://github.com/motherduckdb/metabase_duckdb_driver), the JDBC driver must first be downloaded into the `plugins/`, prior to Metabase initialization  (default: `/app/plugins`), which is exactly what `metabase-init` does
+
+
+## TODO's
 - [x] Bootstrap Metabase infrastructure in Docker
-- [ ] Build data viz for NYC Taxi Dataset on Metabase
-
+- [x] Build data viz for NYC Taxi Dataset on Metabase
