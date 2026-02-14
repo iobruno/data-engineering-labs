@@ -1,6 +1,6 @@
-x-superset-image: &superset-image apache/superset:${SUPERSET_VERSION:-4.0.2}
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-17-alpine}
-x-redis-image: &redis-image redis:${REDIS_VERSION:-7-alpine}
+x-superset-image: &superset-image apache/superset:${SUPERSET_VERSION:-6.0.0}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
+x-redis-image: &redis-image redis:${REDIS_VERSION:-8.6-alpine}
 
 x-superset-common:
   &superset-common
