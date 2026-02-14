@@ -1,0 +1,70 @@
+# Batch processing with PySpark 3.5
+
+![Python](https://img.shields.io/badge/Python-3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
+[![PySpark](https://img.shields.io/badge/PySpark-3.5-262A38?style=flat-square&logo=apachespark&logoColor=E36B22&labelColor=262A38)](https://spark.apache.org/docs/3.5.7/api/python/user_guide)
+[![Hadoop](https://img.shields.io/badge/Hadoop-3.3.x-262A38?style=flat-square&logo=apachehadoop&logoColor=FDEE21&labelColor=262A38)](https://spark.apache.org/docs/4.0.2/api/python/user_guide)
+[![Scala](https://img.shields.io/badge/Scala-2.12-262A38?style=flat-square&logo=scala&logoColor=E03E3C&labelColor=262A38)](https://sdkman.io/usage/)
+[![JDK](https://img.shields.io/badge/JDK-17_|_11_|_8-35667C?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1D213B)](https://sdkman.io/usage/)
+[![uv](https://img.shields.io/badge/astral/uv-261230?style=flat&logo=uv&logoColor=DE5FE9&labelColor=261230)](https://docs.astral.sh/uv/getting-started/installation/)
+[![Docker](https://img.shields.io/badge/Docker-329DEE?style=flat&logo=docker&logoColor=white&labelColor=329DEE)](https://docs.docker.com/get-docker/)
+
+![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
+
+
+## Getting Started
+
+**1.** Install JDK 17 or 11 or 8 (Java 8 prior to 8u371 are deprecated) for Spark 3.5.x with [SDKMan](https://sdkman.io/):
+```shell
+sdk i java 17.0.18-librca
+```
+
+**2.** Install dependencies from pyproject.toml and activate the created virtualenv:
+```shell
+uv sync && source .venv/bin/activate
+```
+
+**3.** (Optional) Install pre-commit:
+```shell
+brew install pre-commit
+
+# From root folder where `.pre-commit-config.yaml` is located, run:
+pre-commit install
+```
+
+**4.** Spin up the Spark Cluster with:
+```shell
+docker compose -f ../compose.yaml up -d
+```
+
+
+## Compatibility Matrix
+
+### Spark 3.5.x, Hadoop, and GCS Connector
+
+| Spark | Bundled Hadoop | GCS Connector | Status |
+|-------|---------------|---------------|--------|
+| 3.5.x | 3.3.4 | `gcs-connector-hadoop3-2.2.x-shaded.jar` | ✅ Recommended. Built against Hadoop 3.3.x. |
+| 3.5.x | 3.3.4 | `gcs-connector-hadoop2-*-shaded.jar` | ❌ Hadoop 2.x only. |
+| 3.5.x | 3.3.4 | `gcs-connector-3.1.x-shaded.jar` | ❌ `NoClassDefFoundError: OpenFileOptions` at runtime. Requires Hadoop 3.4+. |
+| 3.5.x | 3.3.4 | `gcs-connector-4.0.x-shaded.jar` | ❌ Same issue. Built against Hadoop 3.4.2. |
+
+### Auth Configuration
+
+| Connector | Auth Type | Keyfile Path |
+|-----------|-----------|-------------|
+| 2.2.x | `fs.gs.auth.service.account.enable=true` | `fs.gs.auth.service.account.json.keyfile` |
+
+> **Note:** In Spark config files, all Hadoop properties must be prefixed with `spark.hadoop.`.
+> The `fs.gs.impl` and `fs.AbstractFileSystem.gs.impl` properties are unchanged across all versions.
+
+
+## TODO's:
+- [x] PEP-517: Packaging and dependency management with `uv`
+- [x] Spin up a Spark Cluster in Standalone mode w/ Spark Connect
+- [x] `submit` a PySpark Job to the cluster with Spark Connect
+- [x] `spark-submit` a PySpark Job to the cluster in `--deploy-mode client`
+- [x] Enable Spark to read from Google Cloud Storage
+- [ ] Submit a PySpark job to Google Dataproc
+- [ ] Enable Spark to read from AWS S3
+- [ ] Deploy [Spark to Kubernetes with Helm](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) with [minikube](https://minikube.sigs.k8s.io/docs/start/) or [kind](https://kind.sigs.k8s.io/)
+- [ ] Submit a PySpark job to the K8s Spark Cluster
