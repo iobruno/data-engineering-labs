@@ -22,9 +22,10 @@ services:
     container_name: spark-master
     command: |
       /opt/spark/sbin/start-master.sh
-      --properties-file /opt/spark/conf/spark-standalone.conf      
+      --properties-file /opt/spark/conf/spark-standalone.conf
+      --webui-port 4040
     ports:
-      - '4040:8080'   # Spark Master WebUI port (4040 → 8080 in Spark 4.x)
+      - '4040:4040'   # default: 8080 for master
       - '7077:7077'
     restart: on-failure:5
 
@@ -37,8 +38,9 @@ services:
       --cores 2
       --memory 4G
       --properties-file /opt/spark/conf/spark-standalone.conf
+      --webui-port 4041
     ports:
-      - '4041:8081'   # Spark Worker WebUI port (4041 → 8081 in Spark 4.x)
+      - '4041:4041'   # default: 8081 for worker
     depends_on:
       spark-master:
         condition: service_started
@@ -53,8 +55,9 @@ services:
       --cores 4
       --memory 6G
       --properties-file /opt/spark/conf/spark-standalone.conf
+      --webui-port 4042
     ports:
-      - '4042:8081'   # Spark Worker WebUI port (4042 → 8081 in Spark 4.x)
+      - '4042:4042'   # default: 8081 for worker
     depends_on:
       spark-master:
         condition: service_started
