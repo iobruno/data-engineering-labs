@@ -16,10 +16,10 @@
 {% macro resolve_type(model_type='staging') -%}
 
     {%- set target_env_var = 'DBT_CLICKHOUSE_TARGET_DATABASE'  -%}
-    {%- set stging_env_var = 'DBT_CLICKHOUSE_STAGING_DATABASE' -%}
+    {%- set staging_env_var = 'DBT_CLICKHOUSE_STAGING_DATABASE' -%}
 
     {%- if model_type == 'core' -%} {{- env_var(target_env_var) -}}
-    {%- else -%}                    {{- env_var(stging_env_var, 'stg_' ~ env_var(target_env_var)) -}}
+    {%- else -%}                    {{- env_var(staging_env_var, 'stg_' ~ env_var(target_env_var)) -}}
     {%- endif -%}
 
 {%- endmacro %}
