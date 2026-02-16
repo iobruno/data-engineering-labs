@@ -16,8 +16,8 @@ On the GCP Console, create a new `Service Account` with the roles of:
 
 Next, access the created service_account, and create a 'New Key' with `Key type: JSON`, and save it somewhere safe on your workstation
 
-![terraform-service-account](../../assets/terraform-service-account-pt1.png)
-![terraform-service-account](../../assets/terraform-service-account-pt2.png)
+![terraform-service-account](../../.assets/terraform-service-account-pt1.png)
+![terraform-service-account](../../.assets/terraform-service-account-pt2.png)
 
 
 Now, export the environment variables `GOOGLE_APPLICATION_CREDENTIALS` pointing to the full path where the .json credentials file was downloaded/saved:
@@ -33,7 +33,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/gcp-credentials.json
 
 In [Google Cloud Storage](https://console.cloud.google.com/storage/browser?hl=en&project=iobruno-gcp-labs), create a bucket that Terraform will use as its backend to save state:
 
-![terraform-state-bucket](../../assets/terraform-tfstate-bucket.png)
+![terraform-state-bucket](../../.assets/terraform-tfstate-bucket.png)
 
 
 **2.** Configure Terraform backend for GCS:
