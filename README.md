@@ -11,7 +11,7 @@ Refer to the modules below for covered topics and tools.
 * Rust data ingestion
 * [ELT Ingestion with Airbyte](./module1-data-ingestion/airbyte/)
 * [data load tool (dlt)](./module1-data-ingestion/data-load-tool/)
-* [IaC with Terraform (Google Cloud Platform)](./infrastructure/terraform-gcp/)
+* [IaC with Terraform (Google Cloud Platform)](./infrastructure/gcp/)
 
 ### [Module 2: Workflow orchestration](./module2-workflow-orchestration/)
 * Workflow orchestration with Airflow 3.x
