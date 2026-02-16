@@ -22,12 +22,12 @@ Make sure to: `unset SUPERSET_LOAD_EXAMPLES` or `export SUPERSET_LOAD_EXAMPLES=n
 
 **1.** Spin up Apache Superset infrastructure with:
 ```shell
-docker compose -f compose.superset.yaml up -d
+docker compose -f compose.yaml up -d
 ```
 
 **2.** Additional database drivers:
 
-Superset supports PostgreSQL, MySQL and out-of-the-box. To enable additional data sources, include the respective `SQLAlchemy` driver as a dependency in [requirements-local.txt](./superset/requirements-local.txt). 
+Superset supports PostgreSQL, MySQL and out-of-the-box. To enable additional data sources, include the respective `SQLAlchemy` driver as a dependency in [requirements-local.txt](./conf/requirements-local.txt). 
 
 A complete list of supported data sources can be found [here](https://superset.apache.org/docs/databases/installing-database-drivers/).
 

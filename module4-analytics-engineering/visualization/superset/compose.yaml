@@ -21,13 +21,14 @@ x-superset-common:
     # Superset specific env vars
     SUPERSET_ENV: 'production'
     SUPERSET_PORT: 8088
-    SUPERSET_LOAD_EXAMPLES: ${SUPERSET_LOAD_EXAMPLES:-no}
     SUPERSET_SECRET_KEY: 'TEST_NON_DEV_SECRET'
     CYPRESS_CONFIG: 'false'
+    SUPERSET_LOG_LEVEL: 'info'
     MAPBOX_API_KEY: ''
     # Add the mapped in /app/pythonpath_docker which allows devs to override stuff
     PYTHONPATH: '/app/pythonpath:/app/docker/pythonpath_dev'
     # Examples DB
+    SUPERSET_LOAD_EXAMPLES: ${SUPERSET_LOAD_EXAMPLES:-no}
     EXAMPLES_HOST: 'superset-db'
     EXAMPLES_PORT: 5432
     EXAMPLES_DB: 'examples'
@@ -35,7 +36,7 @@ x-superset-common:
     EXAMPLES_PASSWORD: 'examples'
   volumes: 
     &superset-common-volumes
-    - ./superset:/app/docker
+    - ./conf:/app/docker
     - vol-superset-home:/app/superset_home
   depends_on:
     &superset-common-depends-on
@@ -59,7 +60,7 @@ services:
       - '5432'
     volumes:
       - vol-superset-db:/var/lib/postgresql/data
-      - ./superset/examples-init.sh:/docker-entrypoint-initdb.d/examples-init.sh
+      - ./conf/examples-init.sh:/docker-entrypoint-initdb.d/examples-init.sh
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U superset"]
       interval: 5s
