@@ -103,6 +103,7 @@ def main():
     )
 
     logger.info("All done!")
+    spark.stop()
 
 
 if __name__ == "__main__":
