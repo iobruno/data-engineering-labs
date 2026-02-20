@@ -12,6 +12,11 @@ x-spark-common:
     - ./logs/:/opt/spark/logs/
     - ./spark-3.5-standalone.conf:/opt/spark/conf/spark-standalone.conf
     - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
+    - vol-spark-extra-jars:/opt/spark/extra-jars/
+  depends_on:
+    &spark-common-depends-on
+    spark-init:
+      condition: service_completed_successfully
 
 services:
   spark-master:
@@ -74,7 +79,7 @@ services:
     depends_on:
       spark-master:
         condition: service_started
-    restart: on-failure:3
+    restart: on-failure:5
 
   spark-history-server:
     <<: *spark-common
@@ -92,3 +97,21 @@ services:
       spark-master:
         condition: service_started
     restart: on-failure:5
+
+  spark-init:
+    image: *spark-image
+    container_name: spark-init
+    user: 0:0
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        apt-get update && apt-get install curl -y
+        curl --create-dirs -O --output-dir /opt/spark/extra-jars/ https://repo1.maven.org/maven2/com/google/cloud/bigdataoss/gcs-connector/hadoop3-2.2.32/gcs-connector-hadoop3-2.2.32-shaded.jar
+        chown -R 185:185 /opt/spark/extra-jars/
+    volumes:
+      - vol-spark-extra-jars:/opt/spark/extra-jars/
+
+volumes:
+  vol-spark-extra-jars:
+    name: vol-spark-extra-jars
