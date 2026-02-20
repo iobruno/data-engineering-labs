@@ -1,25 +1,30 @@
 # Builder stage
-FROM python:3.12-slim AS builder
+FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim AS builder
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+WORKDIR /app
 
-ENV UV_COMPILE_BYTECODE=1
+COPY uv.lock pyproject.toml README.md ./
 
-RUN --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    --mount=type=bind,source=README.md,target=README.md \
-    uv pip install -r pyproject.toml --system
+RUN --mount=type=cache,target=/root/.cache/uv \
+    UV_COMPILE_BYTECODE=1 \
+    uv pip install --system --no-cache .
 
-ADD analyses /dbt/analyses
-ADD macros   /dbt/macros
-ADD models   /dbt/models
-ADD seeds    /dbt/seeds
-ADD tests    /dbt/tests
-ADD dbt_project.yml package-lock.yml packages.yml /dbt/
-ADD profiles.tmpl.yml                             /dbt/profiles.yml
+ADD analyses                                        /dbt/analyses
+ADD macros                                          /dbt/macros
+ADD models                                          /dbt/models
+ADD seeds                                           /dbt/seeds
+ADD tests                                           /dbt/tests
+ADD dbt_project.yml package-lock.yml packages.yml   /dbt/
+ADD profiles.tmpl.yml                               /dbt/profiles.yml
 
 # Runner stage
-FROM python:3.12-slim AS runner
+FROM python:3.13-slim AS runner
+
+WORKDIR /dbt/
+
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /dbt /dbt
 
 ENV DBT_PROFILES_DIR=/dbt/
 ENV DBT_POSTGRES_HOST=
@@ -30,10 +35,4 @@ ENV DBT_POSTGRES_TARGET_SCHEMA=
 ENV DBT_POSTGRES_USER=
 ENV DBT_POSTGRES_PASSWORD=
 
-COPY --from=builder /usr/local/lib/python3.12   /usr/local/lib/python3.12
-COPY --from=builder /usr/local/bin/*            /usr/local/bin/
-COPY --from=builder /dbt                        /dbt
-
-WORKDIR /dbt/
-
-ENTRYPOINT ["sh", "-c", "dbt deps && dbt seed --target prod && dbt run --target prod"]
+ENTRYPOINT ["sh", "-c", "dbt deps && dbt build --target prod && cp target/run_results.json target/run_results_backup.json && dbt docs generate --target prod && cp target/run_results_backup.json target/run_results.json"]
