@@ -53,7 +53,7 @@ def get_spark_session() -> SparkSession:
         .config("spark.driver.memory", "2g")
         .config("spark.executor.memory", "4g")
         .config("spark.cores.max", 8)
-        .appName("pyspark3-playground")
+        .appName("pyspark-3.5-pipeline")
         .getOrCreate()
     )
 

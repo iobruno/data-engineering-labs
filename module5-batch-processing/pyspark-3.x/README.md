@@ -36,6 +36,11 @@ pre-commit install
 docker compose -f ../compose.spark-3.5-standalone.yaml up -d
 ```
 
+**5.** Spark Web UI
+- Spark Master Web UI can be accessed at [http://localhost:4040](http://localhost:4040)
+- Spark History Server can be accessed at [http://localhost:18080](http://localhost:18080)
+
+
 ## Spark-submit Application
 
 ### Local (Spark Driver running on local machine)

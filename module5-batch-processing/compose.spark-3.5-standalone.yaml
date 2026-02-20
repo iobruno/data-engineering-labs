@@ -5,8 +5,8 @@ x-spark-common:
   image: *spark-image
   environment:
     &spark-common-env
-    SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
-    SPARK_PUBLIC_DNS: localhost  # Ensures Web UI links point to localhost instead of container IPs
+    SPARK_NO_DAEMONIZE: true      # Forces the process to run in foreground (req. for Docker)
+    SPARK_PUBLIC_DNS: localhost   # Ensures Web UI links point to localhost instead of container IPs
     GOOGLE_APPLICATION_CREDENTIALS: "/secrets/gcp_credentials.json"
   volumes:
     &spark-common-vol
