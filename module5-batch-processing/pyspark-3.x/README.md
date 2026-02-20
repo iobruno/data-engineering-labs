@@ -36,6 +36,16 @@ pre-commit install
 docker compose -f ../compose.yaml up -d
 ```
 
+## Spark-submit Application
+
+```shell
+spark-submit \
+    --master spark://localhost:7077 \
+    --conf spark.eventLog.enabled=true \
+    --conf spark.eventLog.dir=file://$(pwd)/logs/ \
+    --packages "com.google.cloud.bigdataoss:gcs-connector:hadoop3-2.2.32" \
+    fhv_zones_gcs.py
+```
 
 ## Compatibility Matrix
 
