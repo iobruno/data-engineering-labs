@@ -1,4 +1,3 @@
-from os import environ as env
 from os import getenv
 
 from pyspark.sql import DataFrame, SparkSession
@@ -47,41 +46,35 @@ def join_dfs_with_spark_sql(spark: SparkSession) -> DataFrame:
     )
 
 
-def config_spark_session(name: str, master: str = "local[*]") -> SparkSession:
-    spark = (
+def get_spark_session() -> SparkSession:
+    return (
         SparkSession.builder
         .config("spark.sql.execution.arrow.pyspark.enabled", "true")
         .config("spark.driver.memory", "2g")
-        .config("spark.executor.memory", "8g")
+        .config("spark.executor.memory", "4g")
         .config("spark.cores.max", 8)
-        .appName(name)
-        .master(master)
+        .appName("pyspark-3.5-pipeline")
         .getOrCreate()
     )
-    spark._jsc.hadoopConfiguration().set(
-        "google.cloud.auth.service.account.json.keyfile", env["GOOGLE_APPLICATION_CREDENTIALS"]
-    )
-    return spark
-
 
 def main():
-    spark_master = getenv(key="SPARK_MASTER", default="local[*]")
-    spark = config_spark_session(name="pyspark-playground", master=spark_master)
+    spark = get_spark_session()
+    logger = spark._jvm.org.apache.log4j.LogManager.getLogger(__name__)
 
     fhv_gcs_path = getenv(
         key="FHV_GCS_PATH",
-        default="gs://iobruno-datalake-raw/dtc_ny_taxi_tripdata/fhv/fhv_tripdata_2019-01.snappy.parquet",
+        default="gs://iobruno-lakehouse-raw/nyc_tlc_dataset/fhv_trip_data/fhv_tripdata_2019-01.snappy.parquet",
     )
     zone_lookup_gcs_path = getenv(
         key="ZONE_LOOKUP_PATH",
-        default="gs://iobruno-datalake-raw/dtc_ny_taxi_tripdata/zone_lookup/taxi_zone_lookup.csv.gz",
+        default="gs://iobruno-lakehouse-raw/nyc_tlc_dataset/zone_lookup/taxi_zone_lookup.csv.gz",
     )
 
-    print(f"Now fetching 'FHV' Dataset: {fhv_gcs_path}")
-
+    logger.info(f"Now fetching 'FHV' Dataset: {fhv_gcs_path}")
     fhv: DataFrame = spark.read.parquet(fhv_gcs_path)
-    print(f"Now fetching 'Zone Lookup' Dataset: {zone_lookup_gcs_path}")
+    fhv.createTempView("fhv")
 
+    logger.info(f"Now fetching 'Zone Lookup' Dataset: {zone_lookup_gcs_path}")
     zones: DataFrame = (
         spark.read
         .option("header", True)
@@ -95,21 +88,22 @@ def main():
         )
         .csv(path=zone_lookup_gcs_path)
     )
-
-    print("Creating Temporaty Views from DataFrames...")
-    fhv.createTempView("fhv")
     zones.createTempView("zones")
 
     # Join DataFrames with SparkSQL
-    print("Joining DataFrames with SparkSQL")
+    logger.info("Joining DataFrames with SparkSQL")
     sdf = join_dfs_with_spark_sql(spark)
 
-    print("Preparing to write resulting DataFrame...")
-    sdf.write.option("compression", "snappy").mode("overwrite").parquet(
-        "gs://iobruno-datalake-raw/spark-warehouse/"
+    logger.info("Preparing to write resulting DataFrame...")
+    (
+        sdf.write
+        .option("compression", "snappy")
+        .mode("overwrite")
+        .parquet("gs://iobruno-lakehouse-raw/spark-warehouse/")
     )
 
-    print("All done!")
+    logger.info("All done!")
+    spark.stop()
 
 
 if __name__ == "__main__":

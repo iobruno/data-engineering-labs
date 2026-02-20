@@ -33,9 +33,32 @@ pre-commit install
 
 **4.** Spin up the Spark Cluster with:
 ```shell
-docker compose -f ../compose.yaml up -d
+docker compose -f ../compose.spark-3.5-standalone.yaml up -d
 ```
 
+**5.** Spark Web UI
+- Spark Master Web UI can be accessed at [http://localhost:4040](http://localhost:4040)
+- Spark History Server can be accessed at [http://localhost:18080](http://localhost:18080)
+
+
+## Spark-submit Application
+
+### Local (Spark Driver running on local machine)
+
+With `--deploy-mode client` (default), the Spark Driver runs locally and doesn't pick up [spark-3.5-standalone.conf](../compose.spark-3.5-standalone.yaml), so the `--conf spark.hadoop.*` options must be set explicitly.
+
+```shell
+spark-submit \
+    --master spark://localhost:7077 \
+    --packages "com.google.cloud.bigdataoss:gcs-connector:hadoop3-2.2.32" \
+    --conf spark.eventLog.enabled=true \
+    --conf spark.eventLog.dir=file://$(pwd)/../logs/ \
+    --conf spark.driver.userClassPathFirst=true \
+    --conf spark.executor.userClassPathFirst=true \
+    --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \
+    --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
+    fhv_zones_gcs.py
+```
 
 ## Compatibility Matrix
 
