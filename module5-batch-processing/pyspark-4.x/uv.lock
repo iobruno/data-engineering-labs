@@ -1153,7 +1153,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "pyarrow", specifier = ">=23.0.0,<24.0" },
-    { name = "pyspark", extras = ["connect"], specifier = ">=4.0.1,<4.1" },
+    { name = "pyspark", extras = ["connect"], specifier = "==4.0.1" },
 ]
 
 [package.metadata.requires-dev]
