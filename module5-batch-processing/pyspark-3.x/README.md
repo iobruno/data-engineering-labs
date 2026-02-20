@@ -33,17 +33,25 @@ pre-commit install
 
 **4.** Spin up the Spark Cluster with:
 ```shell
-docker compose -f ../compose.yaml up -d
+docker compose -f ../compose.spark-3.5-standalone.yaml up -d
 ```
 
 ## Spark-submit Application
 
+### Local (Spark Driver running on local machine)
+
+With `--deploy-mode client` (default), the Spark Driver runs locally and doesn't pick up [spark-3.5-standalone.conf](../compose.spark-3.5-standalone.yaml), so the `--conf spark.hadoop.*` options must be set explicitly.
+
 ```shell
 spark-submit \
     --master spark://localhost:7077 \
-    --conf spark.eventLog.enabled=true \
-    --conf spark.eventLog.dir=file://$(pwd)/logs/ \
     --packages "com.google.cloud.bigdataoss:gcs-connector:hadoop3-2.2.32" \
+    --conf spark.eventLog.enabled=true \
+    --conf spark.eventLog.dir=file://$(pwd)/../logs/ \
+    --conf spark.driver.userClassPathFirst=true \
+    --conf spark.executor.userClassPathFirst=true \
+    --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \
+    --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
     fhv_zones_gcs.py
 ```
 
@@ -78,3 +86,6 @@ spark-submit \
 - [ ] Enable Spark to read from AWS S3
 - [ ] Deploy [Spark to Kubernetes with Helm](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) with [minikube](https://minikube.sigs.k8s.io/docs/start/) or [kind](https://kind.sigs.k8s.io/)
 - [ ] Submit a PySpark job to the K8s Spark Cluster
+
+
+gsutil ls gs://iobruno-lakehouse-raw/
