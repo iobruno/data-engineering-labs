@@ -7,12 +7,15 @@ x-spark-common:
   image: *spark-image
   environment:
     &spark-common-env
-    SPARK_NO_DAEMONIZE: true    # Forces the process to run in foreground (req. for Docker)
+    SPARK_NO_DAEMONIZE: true      # Forces the process to run in foreground (req. for Docker)
+    SPARK_PUBLIC_DNS: localhost   # Ensures Web UI links point to localhost instead of container IPs
+    GOOGLE_APPLICATION_CREDENTIALS: "/secrets/gcp_credentials.json"
   volumes:
     &spark-common-vol
-    - vol-spark-extra-jars:/opt/spark/extra-jars/
+    - ./logs/:/opt/spark/logs/
     - ./spark-4.0-standalone.conf:/opt/spark/conf/spark-standalone.conf
     - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
+    - vol-spark-extra-jars:/opt/spark/extra-jars/
   depends_on:
     &spark-common-depends-on
     spark-init:
@@ -77,7 +80,24 @@ services:
     depends_on:
       spark-master:
         condition: service_started
-    restart: on-failure:3
+    restart: on-failure:5
+
+  spark-history-server:
+    <<: *spark-common
+    container_name: spark-history-server
+    command: |
+      /opt/spark/sbin/start-history-server.sh
+      --properties-file /opt/spark/conf/spark-standalone.conf
+    environment:
+      <<: *spark-common-env
+      SPARK_HISTORY_OPTS: >-
+        -Dspark.history.fs.logDirectory=/opt/spark/logs/
+    ports:
+      - '18080:18080'
+    depends_on:
+      spark-master:
+        condition: service_started
+    restart: on-failure:5
 
   hive-db:
     image: *postgres-image
@@ -130,6 +150,7 @@ services:
       - |
         apt-get update && apt-get install curl -y
         curl --create-dirs -O --output-dir /opt/spark/extra-jars/ https://repo1.maven.org/maven2/com/google/cloud/bigdataoss/gcs-connector/4.0.2/gcs-connector-4.0.2-shaded.jar
+        chown -R 185:185 /opt/spark/extra-jars/
     volumes:
       - vol-spark-extra-jars:/opt/spark/extra-jars/
 
