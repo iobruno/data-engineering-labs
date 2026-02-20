@@ -37,6 +37,31 @@ pre-commit install
 docker compose -f ../compose.yaml up -d
 ```
 
+**5.** Spark Web UI
+- Spark Master Web UI can be accessed at [http://localhost:4040](http://localhost:4040)
+- Spark History Server can be accessed at [http://localhost:18080](http://localhost:18080)
+
+
+## Spark-submit Application
+
+### Local (Spark Driver running on local machine)
+
+With `--deploy-mode client` (default), the Spark Driver runs locally and doesn't pick up [spark-4.0-standalone.conf](../compose.spark-4.0-standalone.yaml), so the `--conf spark.hadoop.*` options must be set explicitly.
+
+```shell
+spark-submit \
+    --master spark://localhost:7077 \
+    --jars https://repo1.maven.org/maven2/com/google/cloud/bigdataoss/gcs-connector/4.0.2/gcs-connector-4.0.2-shaded.jar \
+    --conf spark.eventLog.enabled=true \
+    --conf spark.eventLog.dir=file://$(pwd)/../logs/ \
+    --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \
+    --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
+    --conf spark.hadoop.google.cloud.auth.type=APPLICATION_DEFAULT \
+    fhv_zones_gcs.py
+```
+
+> **Note:** `APPLICATION_DEFAULT` is recommended here. `spark.hadoop.*` confs set via `spark-submit` propagate to both the driver and the executors. With `SERVICE_ACCOUNT_JSON_KEYFILE`, the keyfile path must be valid on **both** the local machine (driver) and inside the Docker containers (executors). Since the executors already have their own SA keyfile configured via [spark-4.0-standalone.conf](../spark-4.0-standalone.conf), using `APPLICATION_DEFAULT` lets the driver authenticate with local ADC (`gcloud auth application-default login`) while the executors fall back to their cluster-side SA config.
+
 
 ## Compatibility Matrix for GCS
 
