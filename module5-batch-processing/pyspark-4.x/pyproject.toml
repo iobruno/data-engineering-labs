@@ -3,10 +3,10 @@ name = "pyspark-4.0-pipeline"
 version = "2.0"
 description = "Batch processing with PySpark 4"
 readme = "README.md"
-requires-python = ">=3.12,<3.14"
+requires-python = ">=3.12,<3.15"
 
 dependencies = [
-    "pyspark[connect]==4.0.1",
+    "pyspark[connect]==4.1.1",
     "pyarrow>=23.0.0,<24.0",
 ]
 

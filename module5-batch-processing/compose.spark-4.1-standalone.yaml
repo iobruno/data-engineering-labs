@@ -1,4 +1,4 @@
-x-spark-image: &spark-image spark:${SPARK_VERSION:-4.0.1-scala2.13-java21-python3-ubuntu}
+x-spark-image: &spark-image apache/spark:${SPARK_VERSION:-4.1.1-scala2.13-java21-python3-ubuntu}
 x-hive-image:  &hive-image  apache/hive:${HIVE_VERSION:-4.2.0}
 x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
 
@@ -13,7 +13,7 @@ x-spark-common:
   volumes:
     &spark-common-vol
     - ./logs/:/opt/spark/logs/
-    - ./spark-4.0-standalone.conf:/opt/spark/conf/spark-standalone.conf
+    - ./spark-4.1-standalone.conf:/opt/spark/conf/spark-standalone.conf
     - ~/.gcp/spark_credentials.json:/secrets/gcp_credentials.json
     - vol-spark-extra-jars:/opt/spark/extra-jars/
   depends_on:
