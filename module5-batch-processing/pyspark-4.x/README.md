@@ -1,6 +1,6 @@
 # Batch processing with PySpark 4.x
 
-![Python](https://img.shields.io/badge/Python-3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
+![Python](https://img.shields.io/badge/Python-3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
 [![PySpark](https://img.shields.io/badge/PySpark-4.x-262A38?style=flat-square&logo=apachespark&logoColor=E36B22&labelColor=262A38)](https://spark.apache.org/docs/4.0.2/api/python/user_guide)
 [![Hadoop](https://img.shields.io/badge/Hadoop-3.4.x-262A38?style=flat-square&logo=apachehadoop&logoColor=FDEE21&labelColor=262A38)](https://spark.apache.org/docs/4.0.2/api/python/user_guide)
 [![Scala](https://img.shields.io/badge/Scala-2.13-262A38?style=flat-square&logo=scala&logoColor=E03E3C&labelColor=262A38)](https://sdkman.io/usage/)
