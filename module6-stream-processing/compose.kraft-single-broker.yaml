@@ -187,9 +187,9 @@ services:
     ports:
       - '5432'
     volumes:
-      - vol-conduktor-metastore:/var/lib/postgresql/data
+      - vol-conduktor-metastore:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -207,9 +207,9 @@ services:
     ports:
       - '5432'
     volumes:
-      - vol-conduktor-sql:/var/lib/postgresql/data
+      - vol-conduktor-sql:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
       timeout: 5s
       retries: 5
