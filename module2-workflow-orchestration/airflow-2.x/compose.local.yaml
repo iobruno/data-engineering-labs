@@ -46,9 +46,9 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - vol-ingest-db:/var/lib/postgresql/data
+      - vol-ingest-db:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -64,9 +64,9 @@ services:
     ports:
       - '5432'
     volumes:
-      - vol-airflow-metastore-localexec:/var/lib/postgresql/data
+      - vol-airflow-metastore-localexec:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
       timeout: 3s
       retries: 5
