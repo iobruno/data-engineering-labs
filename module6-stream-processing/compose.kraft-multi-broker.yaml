@@ -192,8 +192,8 @@ services:
       CDK_CLUSTERS_0_SCHEMAREGISTRY_URL: 'http://schema-registry:8081'
       CDK_CLUSTERS_0_KSQLDBS_0_NAME: 'ksqldb0'
       CDK_CLUSTERS_0_KSQLDBS_0_URL: 'http://ksqldb0:8088'
-      CDK_DATABASE_URL: "postgresql://postgres:postgres@conduktor-metastore:5432/conduktor"
-      CDK_KAFKASQL_DATABASE_URL: "postgresql://postgres:postgres@conduktor-sql:5432/conduktor-sql"
+      CDK_DATABASE_URL: "postgresql://conduktor:conduktor@conduktor-metastore:5432/conduktor"
+      CDK_KAFKASQL_DATABASE_URL: "postgresql://conduktor:conduktor@conduktor-sql:5432/conduktor_sql"
       CDK_MONITORING_CORTEX-URL: http://conduktor-cortex:9009/
       CDK_MONITORING_ALERT-MANAGER-URL: http://conduktor-cortex:9010/
       CDK_MONITORING_CALLBACK-URL: http://conduktor-console:8080/monitoring/api/
@@ -216,8 +216,8 @@ services:
     container_name: conduktor-metastore
     hostname: conduktor-metastore
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_USER: 'conduktor'
+      POSTGRES_PASSWORD: 'conduktor'
       POSTGRES_DB: 'conduktor'
       POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
     ports:
@@ -236,9 +236,9 @@ services:
     container_name: conduktor-sql
     hostname: conduktor-sql
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
-      POSTGRES_DB: 'conduktor-sql'
+      POSTGRES_USER: 'conduktor'
+      POSTGRES_PASSWORD: 'conduktor'
+      POSTGRES_DB: 'conduktor_sql'
       POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
     ports:
       - '5432'
