@@ -103,8 +103,8 @@ services:
     image: *postgres-image
     container_name: hive-metastore-db
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_USER: 'hive'
+      POSTGRES_PASSWORD: 'hive'
       POSTGRES_DB: 'metastore'
     ports:
       - '5433:5432'
@@ -125,8 +125,8 @@ services:
       SERVICE_OPTS: |-
         -Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver
         -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://hive-db:5432/metastore
-        -Djavax.jdo.option.ConnectionUserName=postgres
-        -Djavax.jdo.option.ConnectionPassword=postgres
+        -Djavax.jdo.option.ConnectionUserName=hive
+        -Djavax.jdo.option.ConnectionPassword=hive
       HIVE_AUX_JARS_PATH: /opt/hive/aux_jars/
       DB_DRIVER: 'postgres'
     ports:
