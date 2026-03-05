@@ -1,4 +1,4 @@
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18-alpine}
 
 services:
   tlc-db:
