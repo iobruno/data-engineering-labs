@@ -1,4 +1,4 @@
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18-alpine}
 x-redis-image: &redis-image redis:${REDIS_VERSION:-8.4-alpine}
 
 x-airflow-common:
