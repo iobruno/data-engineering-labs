@@ -16,7 +16,7 @@ FROM python:3.14-slim AS runner
 WORKDIR /ntlcli/
 
 COPY --from=builder /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /usr/local/bin/tlc /usr/local/bin/tlc
 COPY --from=builder /app /ntlcli/
 COPY datasets.yaml ./
 
