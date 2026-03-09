@@ -1,9 +1,9 @@
 x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18-alpine}
 
 services:
-  tlc-db:
+  nyc-tlc-db:
     image: *postgres-image
-    container_name: tlc-db
+    container_name: nyc-tlc-db
     environment:
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'postgres'
@@ -11,7 +11,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - vol-tlc-db:/var/lib/postgresql
+      - vol-nyc-tlc-db:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
@@ -19,23 +19,24 @@ services:
       retries: 5
     restart: on-failure
 
-  tlc-cli:
-    image: iobruno/tlc-cli:latest
-    container_name: tlc-cli
-    pull_policy: build
+  nyc-tlc-cli:
+    image: nyc-tlc-cli:latest
+    container_name: nyc-tlc-cli
     build:
-      dockerfile: ./Dockerfile
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build
     environment:
-      DB_HOST: 'tlc-db'
-      DB_NAME: 'nyc_tlc'
+      DB_HOST: 'nyc-tlc-db'
       DB_USERNAME: 'postgres'
       DB_PASSWORD: 'postgres'
+      DB_NAME: 'nyc_tlc'
     volumes:
       - ./datasets.yml:/app/datasets.yml
     depends_on:
-      tlc-db:
+      nyc-tlc-db:
         condition: service_healthy
 
 volumes:
-  vol-tlc-db:
-    name: vol-tlc-db
+  vol-nyc-tlc-db:
+    name: vol-nyc-tlc-db
