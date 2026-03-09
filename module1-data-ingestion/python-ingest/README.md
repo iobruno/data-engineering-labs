@@ -31,7 +31,7 @@ pre-commit install
 
 **3.** Spin-up the nyc-tlc-db:
 ```shell
-docker compose up -d tlc-db
+docker compose up -d nyc-tlc-db
 ```
 
 **4.** Export ENV VARS to connect to DB:
@@ -69,7 +69,7 @@ You can use any combination of options above to fetch more than dataset group at
 
 **1.** Build the Docker Image with:
 ```shell
-docker build -t iobruno/tlc-cli:latest . --no-cache
+docker build -t nyc-tlc-cli:latest . --no-cache
 ```
 
 **2.** Start a container with it:
@@ -92,4 +92,3 @@ docker run -d --rm \
 - [x] Re-Implement the pipeline with Polars
 - [x] Containerize it and run app on `Docker`
 - [x] Fix Dockerfile to add support for `Podman`
-- [x] Code format/lint with `ruff`
