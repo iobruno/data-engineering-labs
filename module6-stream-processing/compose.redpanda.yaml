@@ -2,7 +2,7 @@ x-redpanda-image: &redpanda-image redpandadata/redpanda:${REDPANDA_VERSION:-v25.
 
 x-conduktor-console: &conduktor-console-image conduktor/conduktor-console:${CONDUKTOR_PLATFORM_VERSION:-1.42.0}
 x-conduktor-cortex: &conduktor-cortex-image conduktor/conduktor-console-cortex:${CONDUKTOR_PLATFORM_VERSION:-1.42.0}
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18-alpine}
 
 services:
   broker0:
@@ -41,8 +41,8 @@ services:
       CDK_CLUSTERS_0_NAME: 'single-broker-redpanda'
       CDK_CLUSTERS_0_BOOTSTRAPSERVERS: 'broker0:29092'
       CDK_CLUSTERS_0_SCHEMAREGISTRY_URL: 'http://broker0:8081'
-      CDK_DATABASE_URL: "postgresql://postgres:postgres@conduktor-metastore:5432/conduktor"
-      CDK_KAFKASQL_DATABASE_URL: "postgresql://postgres:postgres@conduktor-sql:5432/conduktor-sql"
+      CDK_DATABASE_URL: "postgresql://conduktor:conduktor@conduktor-metastore:5432/conduktor"
+      CDK_KAFKASQL_DATABASE_URL: "postgresql://conduktor:conduktor@conduktor-sql:5432/conduktor_sql"
       CDK_MONITORING_CORTEX-URL: http://conduktor-monitoring:9009/
       CDK_MONITORING_ALERT-MANAGER-URL: http://conduktor-monitoring:9010/
       CDK_MONITORING_CALLBACK-URL: http://conduktor-console:8080/monitoring/api/
@@ -62,16 +62,16 @@ services:
     container_name: conduktor-metastore
     hostname: conduktor-metastore
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_USER: 'conduktor'
+      POSTGRES_PASSWORD: 'conduktor'
       POSTGRES_DB: 'conduktor'
       POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
     ports:
       - '5432'
     volumes:
-      - vol-conduktor-metastore:/var/lib/postgresql/data
+      - vol-conduktor-metastore:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -82,16 +82,16 @@ services:
     container_name: conduktor-sql
     hostname: conduktor-sql
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
-      POSTGRES_DB: 'conduktor-sql'
+      POSTGRES_USER: 'conduktor'
+      POSTGRES_PASSWORD: 'conduktor'
+      POSTGRES_DB: 'conduktor_sql'
       POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
     ports:
       - '5432'
     volumes:
-      - vol-conduktor-sql:/var/lib/postgresql/data
+      - vol-conduktor-sql:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
       timeout: 5s
       retries: 5
