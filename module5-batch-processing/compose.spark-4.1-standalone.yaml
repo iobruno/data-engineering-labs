@@ -1,6 +1,6 @@
 x-spark-image: &spark-image apache/spark:${SPARK_VERSION:-4.1.1-scala2.13-java21-python3-ubuntu}
 x-hive-image:  &hive-image  apache/hive:${HIVE_VERSION:-4.2.0}
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18-alpine}
 
 x-spark-common:
   &spark-common
@@ -103,15 +103,15 @@ services:
     image: *postgres-image
     container_name: hive-metastore-db
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_USER: 'hive'
+      POSTGRES_PASSWORD: 'hive'
       POSTGRES_DB: 'metastore'
     ports:
       - '5433:5432'
     volumes:
-      - vol-hive-db:/var/lib/postgresql/data
+      - vol-hive-db:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -125,8 +125,8 @@ services:
       SERVICE_OPTS: |-
         -Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver
         -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://hive-db:5432/metastore
-        -Djavax.jdo.option.ConnectionUserName=postgres
-        -Djavax.jdo.option.ConnectionPassword=postgres
+        -Djavax.jdo.option.ConnectionUserName=hive
+        -Djavax.jdo.option.ConnectionPassword=hive
       HIVE_AUX_JARS_PATH: /opt/hive/aux_jars/
       DB_DRIVER: 'postgres'
     ports:
