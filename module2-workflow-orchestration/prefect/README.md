@@ -47,7 +47,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/gcs_credentials.json
 
 Then, execute with:
 ```shell
-python flows/web_cs_to_gcs.py
+python flows/web_csv_to_gcs.py
 ```
 
 #### flows/sqlalchemy_ingest.py:
