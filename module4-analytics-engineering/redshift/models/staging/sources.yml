@@ -3,12 +3,18 @@ version: 2
 sources:
   - name: raw_nyc_tlc_record_data
     database: |-
-      {%- if env_var('DBT_REDSHIFT_USE_DATA_CATALOG', 0) == '1' -%} awsdatacatalog
-      {%- else -%} {{ env_var('DBT_REDSHIFT_DATABASE') }}
+      {%- if env_var('DBT_REDSHIFT_USE_DATA_CATALOG', 0) == '1' -%}
+        awsdatacatalog
+      {%- else -%}
+        {{ env_var('DBT_REDSHIFT_SOURCE_DATABASE') }}
       {%- endif -%}
 
-    schema: "{{ env_var('DBT_REDSHIFT_SOURCE_SCHEMA', env_var('DBT_REDSHIFT_SOURCE_GLUE_CATALOG_DB')) }}"
+    # IMPORTANT: When the source is Glue Data Catalog, `schema` must match the Glue
+    # Database name, and each entry in `tables` must match an actual table name
+    # under that Glue database
+    schema: "{{ env_var('DBT_REDSHIFT_SOURCE_SCHEMA') }}"
     tables:
-      - name: fhv
-      - name: green_taxi
-      - name: yellow_taxi
+      - name: green_trip_data
+      - name: yellow_trip_data
+      - name: fhv_trip_data
+      - name: zone_lookup
