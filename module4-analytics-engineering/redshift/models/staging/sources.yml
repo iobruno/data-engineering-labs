@@ -2,12 +2,7 @@ version: 2
 
 sources:
   - name: raw_nyc_tlc_record_data
-    database: |-
-      {%- if env_var('DBT_REDSHIFT_USE_DATA_CATALOG', 0) == '1' -%}
-        awsdatacatalog
-      {%- else -%}
-        {{ env_var('DBT_REDSHIFT_SOURCE_DATABASE') }}
-      {%- endif -%}
+    database: "{{ env_var('DBT_REDSHIFT_SOURCE_DATABASE') }}"
 
     # IMPORTANT: When the source is Glue Data Catalog, `schema` must match the Glue
     # Database name, and each entry in `tables` must match an actual table name

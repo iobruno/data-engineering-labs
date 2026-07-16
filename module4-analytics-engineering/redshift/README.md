@@ -11,7 +11,7 @@ This project is meant for experimenting with `dbt` and the `dbt-redshift` adapte
 using [NYC TLC Trip Record](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) dataset as the datasource, with Kimball dimensional modeling technique.
 
 
-**IMPORTANT NOTE**: By default, a Redshift Serverless workgroup is only reachable from within its VPC. If you're running `dbt` from outside of it (e.g. your local machine) and get a connection timeout, you'll need to temporarily:
+**IMPORTANT NOTE**: By default, a Redshift is only reachable from within its VPC. If you're running `dbt` from outside of it (e.g. your local machine) and get a connection timeout, you'll need to temporarily:
 
 1. On the workgroup's network settings, toggle **Publicly accessible** on
 2. On its VPC security group, add an inbound rule for **Redshift (TCP 5439)** with source **My IP** (avoid `0.0.0.0/0`)
@@ -44,9 +44,9 @@ cat profiles.redshift-serverless.yml >> ~/.dbt/profiles.yml
 
 3.2a. Set the env variables for `dbt-redshift` (Redshift Serverless): 
 ```shell
-export DBT_REDSHIFT_HOST=[workgroup_name].[account_id].[region].redshift-serverless.amazonaws.com
-export DBT_REDSHIFT_USE_DATA_CATALOG=1
-export DBT_REDSHIFT_SOURCE_SCHEMA=nyc_tlc_raw
+export DBT_REDSHIFT_HOST=[endpoint]
+export DBT_REDSHIFT_SOURCE_DATABASE=dev
+export DBT_REDSHIFT_SOURCE_SCHEMA=nyc_tlc_ext
 export DBT_REDSHIFT_TARGET_DATABASE=dev
 export DBT_REDSHIFT_TARGET_SCHEMA=nyc_tlc_trip_data
 export DBT_REDSHIFT_IAM_PROFILE=iobruno-aws-labs
@@ -54,15 +54,15 @@ export DBT_REDSHIFT_IAM_PROFILE=iobruno-aws-labs
 
 
 3.2b. Set the env vars for `dbt-redshift` (Redshift Provisioned)
-
 ```shell
-export DBT_REDSHIFT_HOST=redshift.[id].[region].redshift-serverless.amazonaws.com
-export DBT_REDSHIFT_CLUSTER_ID=
-export DBT_REDSHIFT_DATABASE=dev
-export DBT_REDSHIFT_USE_DATA_CATALOG=1
-export DBT_REDSHIFT_SOURCE_GLUE_CATALOG_DB=raw_nyc_tlc_tripdata
+export DBT_REDSHIFT_HOST=[endpoint]
+export DBT_REDSHIFT_CLUSTER_ID=[cluster_id]
+export DBT_REDSHIFT_SOURCE_DATABASE=dev
+export DBT_REDSHIFT_SOURCE_SCHEMA=nyc_tlc_ext
+export DBT_REDSHIFT_TARGET_DATABASE=dev
 export DBT_REDSHIFT_TARGET_SCHEMA=nyc_tlc_record_data
-export DBT_REDSHIFT_IAM_PROFILE=
+export DBT_REDSHIFT_IAM_PROFILE=iobruno-aws-labs
+export DBT_REDSHIFT_USER=<iam_user_if_group_federation_else_db_user>
 ```
 
 **4.** Install dbt dependencies and trigger the pipeline

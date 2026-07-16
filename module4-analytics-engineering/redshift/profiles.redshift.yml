@@ -8,8 +8,10 @@ dbt_redshift_analytics:
       cluster_id:   "{{ env_var('DBT_REDSHIFT_CLUSTER_ID') }}"
       dbname:       "{{ env_var('DBT_REDSHIFT_TARGET_DATABASE') }}"
       schema:       "{{ env_var('DBT_REDSHIFT_TARGET_SCHEMA') }}"
-      user:         "{{ env_var('DBT_REDSHIFT_USER', 'dbt_redshift') }}"  # db_user must be created
-      iam_profile:  "{{ env_var('DBT_REDSHIFT_IAM_PROFILE') }}"           # reads profile defined in ~/.aws/credentials
+      iam_profile:  "{{ env_var('DBT_REDSHIFT_IAM_PROFILE') }}"   # reads profile defined in ~/.aws/credentials
+      user:         "{{ env_var('DBT_REDSHIFT_USER') }}"
+      group_federation: true                                      # logs in as IAM:<user> — must be a valid IAM identity
+      # group_federation: false                                   # logs in as <user> — an existing DB user; create via CREATE USER <user> PASSWORD '<pwd>' (pwd unused under IAM auth)
       threads: 4
 
     prod:
@@ -20,8 +22,10 @@ dbt_redshift_analytics:
       cluster_id:   "{{ env_var('DBT_REDSHIFT_CLUSTER_ID') }}"
       dbname:       "{{ env_var('DBT_REDSHIFT_TARGET_DATABASE') }}"
       schema:       "{{ env_var('DBT_REDSHIFT_TARGET_SCHEMA') }}"
-      user:         "{{ env_var('DBT_REDSHIFT_USER', 'dbt_redshift') }}" # db_user must be created 
-      iam_profile:  "{{ env_var('DBT_REDSHIFT_IAM_PROFILE') }}"          # reads profile defined in ~/.aws/credentials
+      iam_profile:  "{{ env_var('DBT_REDSHIFT_IAM_PROFILE') }}"   # reads profile defined in ~/.aws/credentials
+      user:         "{{ env_var('DBT_REDSHIFT_USER') }}"
+      group_federation: true                                      # logs in as IAM:<user> — must be a valid IAM identity
+      # group_federation: false                                   # logs in as <user> — an existing DB user; create via CREATE USER <user> PASSWORD '<pwd>' (pwd unused under IAM auth)
       threads: 4
 
   target: dev
