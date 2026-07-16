@@ -10,11 +10,13 @@
 This project is meant for experimenting with `dbt` and the `dbt-redshift` adapter for Analytics,
 using [NYC TLC Trip Record](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) dataset as the datasource, with Kimball dimensional modeling technique.
 
-**IMPORTANT NOTE**: To access `awsdatacatalog` from RedShift, IAM auth method is required. It also explicitly needs USAGE grants that DB, therefore, on Redshift Query Editor, run:
-```sql
-GRANT USAGE ON DATABASE awsdatacatalog to "IAM:my_iam_user";
-GRANT ALL ON DATABASE <DATABASE_NAME> to "IAM:my_iam_user";
-```
+
+**IMPORTANT NOTE**: By default, a Redshift Serverless workgroup is only reachable from within its VPC. If you're running `dbt` from outside of it (e.g. your local machine) and get a connection timeout, you'll need to temporarily:
+
+1. On the workgroup's network settings, toggle **Publicly accessible** on
+2. On its VPC security group, add an inbound rule for **Redshift (TCP 5439)** with source **My IP** (avoid `0.0.0.0/0`)
+
+Remember to revert both changes (toggle it back off / remove the inbound rule) once you're done testing.
 
 
 ## Getting Started
@@ -32,27 +34,35 @@ brew install pre-commit
 pre-commit install
 ```
 
-**3.** Setup dbt profiles.yaml accordingly (use the `profiles.tmpl.yaml` as template)
+**3.** Setup dbt profiles.yaml accordingly (use the `profiles.redshift.yml / profiles.redshift-servless.yml` as template)
 
 3.1. By default, the profiles_dir is the user '$HOME/.dbt/'
 ```shell
 mkdir -p ~/.dbt/
-cat profiles.tmpl.yml >> ~/.dbt/profiles.yml
+cat profiles.redshift-serverless.yml >> ~/.dbt/profiles.yml
 ```
 
-3.2. Set the environment variables for `dbt-bigquery`:
+3.2a. Set the env variables for `dbt-redshift` (Redshift Serverless): 
+```shell
+export DBT_REDSHIFT_HOST=[workgroup_name].[account_id].[region].redshift-serverless.amazonaws.com
+export DBT_REDSHIFT_USE_DATA_CATALOG=1
+export DBT_REDSHIFT_SOURCE_SCHEMA=nyc_tlc_raw
+export DBT_REDSHIFT_TARGET_DATABASE=dev
+export DBT_REDSHIFT_TARGET_SCHEMA=nyc_tlc_trip_data
+export DBT_REDSHIFT_IAM_PROFILE=iobruno-aws-labs
+```
+
+
+3.2b. Set the env vars for `dbt-redshift` (Redshift Provisioned)
+
 ```shell
 export DBT_REDSHIFT_HOST=redshift.[id].[region].redshift-serverless.amazonaws.com
+export DBT_REDSHIFT_CLUSTER_ID=
 export DBT_REDSHIFT_DATABASE=dev
 export DBT_REDSHIFT_USE_DATA_CATALOG=1
 export DBT_REDSHIFT_SOURCE_GLUE_CATALOG_DB=raw_nyc_tlc_tripdata
 export DBT_REDSHIFT_TARGET_SCHEMA=nyc_tlc_record_data
-```
-
-3.3. Also, either have your AWS credentials set on `~/.aws/credentials` or set them as well:
-```shell
-export AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID
-export AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY
+export DBT_REDSHIFT_IAM_PROFILE=
 ```
 
 **4.** Install dbt dependencies and trigger the pipeline
