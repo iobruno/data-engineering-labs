@@ -1,19 +1,19 @@
 [project]
-name = "pyspark-4.0-pipeline"
+name = "pyspark-4.2-pipeline"
 version = "2.0"
 description = "Batch processing with PySpark 4"
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
 
 dependencies = [
-    "pyspark[connect]==4.1.1",
-    "pyarrow>=23.0.0,<24.0",
+    "pyspark[connect]>=4.2.0,<4.3",
+    "pyarrow>=25.0,<26.0",
 ]
 
 [dependency-groups]
 dev = [
     "ruff>=0.15",
-    "jupyterlab>=4.5.3",
+    "jupyterlab>=4.6",
 ]
 
 [tool.ruff]
