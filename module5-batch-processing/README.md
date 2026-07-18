@@ -1,9 +1,14 @@
 # Batch processing with Spark
 
-![Python](https://img.shields.io/badge/Python-3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
 [![PySpark](https://img.shields.io/badge/PySpark-4.2-262A38?style=flat-square&logo=apachespark&logoColor=E36B22&labelColor=262A38)](https://spark.apache.org/docs/4.2.0/api/python/user_guide)
+![Python](https://img.shields.io/badge/Python-3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
 [![Scala](https://img.shields.io/badge/Scala-2.13-262A38?style=flat-square&logo=scala&logoColor=E03E3C&labelColor=262A38)](https://sdkman.io/usage/)
 [![JDK](https://img.shields.io/badge/JDK-25_|_21_|_17-35667C?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1D213B)](https://sdkman.io/usage/)
+
+[![PySpark](https://img.shields.io/badge/PySpark-3.5-262A38?style=flat-square&logo=apachespark&logoColor=E36B22&labelColor=262A38)](https://spark.apache.org/docs/3.5.8/api/python/user_guide)
+![Python](https://img.shields.io/badge/Python-3.11-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
+[![Scala](https://img.shields.io/badge/Scala-2.12-262A38?style=flat-square&logo=scala&logoColor=E03E3C&labelColor=262A38)](https://sdkman.io/usage/)
+[![JDK](https://img.shields.io/badge/JDK-17_|_11_|_8-35667C?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1D213B)](https://sdkman.io/usage/)
 
 
 ## Getting Started

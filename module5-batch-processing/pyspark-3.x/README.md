@@ -1,8 +1,7 @@
 # Batch processing with PySpark 3.5
 
-![Python](https://img.shields.io/badge/Python-3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
-[![PySpark](https://img.shields.io/badge/PySpark-3.5-262A38?style=flat-square&logo=apachespark&logoColor=E36B22&labelColor=262A38)](https://spark.apache.org/docs/3.5.7/api/python/user_guide)
-[![Hadoop](https://img.shields.io/badge/Hadoop-3.3.x-262A38?style=flat-square&logo=apachehadoop&logoColor=FDEE21&labelColor=262A38)](https://spark.apache.org/docs/4.0.2/api/python/user_guide)
+![Python](https://img.shields.io/badge/Python-3.11-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
+[![PySpark](https://img.shields.io/badge/PySpark-3.5-262A38?style=flat-square&logo=apachespark&logoColor=E36B22&labelColor=262A38)](https://spark.apache.org/docs/3.5.8/api/python/user_guide)
 [![Scala](https://img.shields.io/badge/Scala-2.12-262A38?style=flat-square&logo=scala&logoColor=E03E3C&labelColor=262A38)](https://sdkman.io/usage/)
 [![JDK](https://img.shields.io/badge/JDK-17_|_11_|_8-35667C?style=flat&logo=openjdk&logoColor=FFFFFF&labelColor=1D213B)](https://sdkman.io/usage/)
 [![uv](https://img.shields.io/badge/astral/uv-261230?style=flat&logo=uv&logoColor=DE5FE9&labelColor=261230)](https://docs.astral.sh/uv/getting-started/installation/)
@@ -15,7 +14,7 @@
 
 **1.** Install JDK 17 or 11 or 8 (Java 8 prior to 8u371 are deprecated) for Spark 3.5.x with [SDKMan](https://sdkman.io/):
 ```shell
-sdk i java 17.0.18-librca
+sdk i java 17.0.19-librca
 ```
 
 **2.** Install dependencies from pyproject.toml and activate the created virtualenv:
@@ -57,7 +56,7 @@ spark-submit \
     --conf spark.executor.userClassPathFirst=true \
     --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \
     --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
-    fhv_zones_gcs.py
+    ../fhv_zones_gcs.py
 ```
 
 ## Compatibility Matrix
