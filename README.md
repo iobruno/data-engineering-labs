@@ -36,7 +36,6 @@ Refer to the modules below for covered topics and tools.
 ### [Module 5: Batch processing](./module5-batch-processing/)
 * [PySpark 4.x + Spark Connect](./module5-batch-processing/pyspark-4.x/)
 * [PySpark 3.x + Spark Connnect](./module5-batch-processing/pyspark-3.x/)
-* Spark + Kotlin API
 * Spark (Scala)
 
 ### [Module 6: Stream processing](./module6-stream-processing/)
