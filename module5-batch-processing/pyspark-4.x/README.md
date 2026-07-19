@@ -74,6 +74,8 @@ spark-submit \
 
 | Spark | Bundled Hadoop | GCS Connector | Status |
 |-------|---------------|---------------|--------|
+| 4.2.x | 3.5.0 | `gcs-connector-4.0.x-shaded.jar` | ⚠️ Works, but needs `fs.gs.block.size` override — see note above. |
+| 4.2.x | 3.5.0 | `gcs-connector-3.1.x-shaded.jar` | ⚠️ Same `fs.gs.block.size` issue as 4.0.x. |
 | 4.0.x | 3.4.1 | `gcs-connector-4.0.x-shaded.jar` | ✅ Recommended. Built against Hadoop 3.4.2. |
 | 4.0.x | 3.4.1 | `gcs-connector-3.1.x-shaded.jar` | ⚠️ Compatible, but targets Hadoop 3.3.5. |
 | 4.0.x | 3.4.1 | `gcs-connector-hadoop3-2.2.x-shaded.jar` | ⚠️ Works, but uses legacy auth config and misses `openFile` optimization. |
