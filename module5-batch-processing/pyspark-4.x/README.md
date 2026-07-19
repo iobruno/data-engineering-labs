@@ -57,10 +57,15 @@ spark-submit \
     --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \
     --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
     --conf spark.hadoop.google.cloud.auth.type=APPLICATION_DEFAULT \
+    --conf spark.hadoop.fs.gs.block.size=67108864 \
     ../fhv_zones_gcs.py
 ```
 
-> **Note:** `APPLICATION_DEFAULT` is recommended here. `spark.hadoop.*` confs set via `spark-submit` propagate to both the driver and the executors. With `SERVICE_ACCOUNT_JSON_KEYFILE`, the keyfile path must be valid on **both** the local machine (driver) and inside the Docker containers (executors). Since the executors already have their own SA keyfile configured via [spark-4.0-standalone.conf](../spark-4.0-standalone.conf), using `APPLICATION_DEFAULT` lets the driver authenticate with local ADC (`gcloud auth application-default login`) while the executors fall back to their cluster-side SA config.
+> **Note:** `APPLICATION_DEFAULT` is recommended here. `spark.hadoop.*` confs set via `spark-submit` propagate to both the driver and the executors. With `SERVICE_ACCOUNT_JSON_KEYFILE`, the keyfile path must be valid on **both** the local machine (driver) and inside the Docker containers (executors). Since the executors already have their own SA keyfile configured via [spark-4.0-standalone.conf](../spark-4.0-standalone.conf), using `APPLICATION_DEFAULT` lets the driver authenticate with local ADC (`gcloud auth application-default login`) while the executors fall back to their
+
+> **Note:** `fs.gs.block.size` must be set explicitly, as a raw byte value (not `64m`).
+> - **Why:** Hadoop 3.5.0's `core-default.xml` (bundled with Spark 4.2) defaults it to `64m`, but `gcs-connector` ≤ `4.0.4`/`3.1.18` parses it with `Configuration.getLong()`, which can't handle unit suffixes → `NumberFormatException: For input string: "64m"` on any `gs://` read.
+> - **Fixed upstream:** [`2dd981a`](https://github.com/GoogleCloudDataproc/hadoop-connectors/commit/2dd981a50) ([#1731](https://github.com/GoogleCloudDataproc/hadoop-connectors/pull/1731)), merged to `master` 2026-07-07, not yet in a tagged release. Drop the `--conf` line above once it ships.
 
 
 ## Compatibility Matrix for GCS
@@ -69,6 +74,8 @@ spark-submit \
 
 | Spark | Bundled Hadoop | GCS Connector | Status |
 |-------|---------------|---------------|--------|
+| 4.2.x | 3.5.0 | `gcs-connector-4.0.x-shaded.jar` | ⚠️ Works, but needs `fs.gs.block.size` override — see note above. |
+| 4.2.x | 3.5.0 | `gcs-connector-3.1.x-shaded.jar` | ⚠️ Same `fs.gs.block.size` issue as 4.0.x. |
 | 4.0.x | 3.4.1 | `gcs-connector-4.0.x-shaded.jar` | ✅ Recommended. Built against Hadoop 3.4.2. |
 | 4.0.x | 3.4.1 | `gcs-connector-3.1.x-shaded.jar` | ⚠️ Compatible, but targets Hadoop 3.3.5. |
 | 4.0.x | 3.4.1 | `gcs-connector-hadoop3-2.2.x-shaded.jar` | ⚠️ Works, but uses legacy auth config and misses `openFile` optimization. |
