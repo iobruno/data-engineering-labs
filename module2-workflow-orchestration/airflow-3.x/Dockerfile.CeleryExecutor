@@ -1,0 +1,10 @@
+FROM apache/airflow:slim-3.1.8-python3.11
+
+USER root
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+USER airflow
+RUN --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=README.md,target=README.md \
+    uv pip install ".[gcp,fab,celery]"
