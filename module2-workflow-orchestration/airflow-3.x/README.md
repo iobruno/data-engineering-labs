@@ -8,12 +8,9 @@
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
 
-This mirrors the [Airflow 2.x](../airflow-2.x/) setup in this same module, but on Airflow 3.1, which introduces a few architectural changes:
+This mirrors the [Airflow 2.x](../airflow-2.x/) setup in this same module, but on Airflow 3.x, which introduces a few architectural changes.˜
 
-- The **webserver** is replaced by the **API server** (`airflow api-server`), serving both the new UI and the stable REST API.
-- DAG parsing is decoupled from the scheduler into its own **DAG processor** service (`airflow dag-processor`), which is now required regardless of executor.
-- Task execution talks to the API server over the new **Task Execution API** (`AIRFLOW__CORE__EXECUTION_API_SERVER_URL`), rather than hitting the metadata DB directly.
-- Auth is now pluggable via **Auth Managers**; the default is the `SimpleAuthManager`. This setup explicitly configures the **FAB Auth Manager** (`apache-airflow-providers-fab`) to preserve the same `airflow`/`airflow` basic-auth login used in the 2.x setup.
+Check the [Migrating to Airflow 3.0](#migrating-to-airflow-3x) section for details.
 
 
 ## Migrating to Airflow 3.x
@@ -22,16 +19,15 @@ Service-by-service comparison against the [Airflow 2.x](../airflow-2.x/) compose
 
 | Airflow 2.x       | Airflow 3.x               | What it is                                                                                                                                                                             |
 |-------------------|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `airflow-web`     | `airflow-api-server`      | Serves the UI and the REST API. Renamed because it's no longer just a webserver: task processes now call into it directly over the new Task Execution API instead of hitting the metadata DB. |
-| *(none — parsed inside the scheduler)* | `airflow-dag-processor`  | New, required regardless of executor. DAG file parsing used to run inside the scheduler process; it's now its own service, so DAG code no longer needs to be readable by the scheduler at all. |
-| `airflow-scheduler` | `airflow-scheduler`     | Same job: evaluates schedules and queues task instances. No longer parses DAG files itself (moved to `airflow-dag-processor`); under LocalExecutor it also calls the Task Execution API to run tasks in-process. |
-| `airflow-worker`  | `airflow-worker`          | CeleryExecutor only. Same job: pulls queued tasks off the broker and executes them. Now talks to `airflow-api-server` over the Task Execution API instead of the metadata DB directly. |
-| `airflow-triggerer` | `airflow-triggerer`     | Unchanged. Runs deferrable/async tasks in a single event loop.                                                                                                                          |
-| `airflow-flower`  | `airflow-flower`          | CeleryExecutor only. Unchanged — Celery task/worker monitoring UI.                                                                                                                     |
-| `airflow-init`    | `airflow-init`            | Same one-shot job: migrates the metadata DB and bootstraps the admin user. In 3.x every other service also syncs FAB permissions on its own startup, so they now explicitly wait for `airflow-init` to finish first (`depends_on: service_completed_successfully`) to avoid racing its inserts on a fresh DB. |
 | `airflow-metastore` | `airflow-metastore`     | Unchanged. Postgres backing Airflow's own metadata DB.                                                                                                                                 |
+| `airflow-web`     | `airflow-api-server`      | Serves the UI and the REST API. Renamed because it's no longer just a webserver: task processes now call into it directly over the new Task Execution API instead of hitting the metadata DB. |
+| `airflow-scheduler` | `airflow-scheduler`     | Same job: evaluates schedules and queues task instances. No longer parses DAG files itself (moved to `airflow-dag-processor`); under LocalExecutor it also calls the Task Execution API to run tasks in-process. |
+| *(none — parsed inside the scheduler)* | `airflow-dag-processor`  | New, required regardless of executor. DAG file parsing used to run inside the scheduler process; it's now its own service, so DAG code no longer needs to be readable by the scheduler at all. |
+| `airflow-triggerer` | `airflow-triggerer`     | Unchanged. Runs deferrable/async tasks in a single event loop.                                                                                                                          |
+| `airflow-init`    | `airflow-init`            | Same one-shot job: migrates the metadata DB and bootstraps the admin user. In 3.x every other service also syncs FAB permissions on its own startup, so they now explicitly wait for `airflow-init` to finish first (`depends_on: service_completed_successfully`) to avoid racing its inserts on a fresh DB. |
+| `airflow-worker`  | `airflow-worker`          | CeleryExecutor only. Same job: pulls queued tasks off the broker and executes them. Now talks to `airflow-api-server` over the Task Execution API instead of the metadata DB directly. |
+| `airflow-flower`  | `airflow-flower`          | CeleryExecutor only. Unchanged — Celery task/worker monitoring UI.                                                                                                                     |
 | `airflow-redis`   | `airflow-redis`           | CeleryExecutor only. Unchanged — Celery broker.                                                                                                                                        |
-| `tlc-db`          | `tlc-db`                  | Unchanged. Target Postgres sink that DAGs ingest NYC TLC data into.                                                                                                                     |
 
 
 ## Getting Started
