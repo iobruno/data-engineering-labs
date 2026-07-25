@@ -1,0 +1,172 @@
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18-alpine}
+
+x-airflow-common:
+  &airflow-common
+  build:
+    context: .
+    dockerfile: Dockerfile.LocalExecutor
+  pull_policy: build
+  image: apache/airflow:slim-3.1.8-python3.11-local
+  user: "${AIRFLOW_UID:-50000}:0"
+  environment:
+    &airflow-common-env
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    ### Core, Auth, Database & Scheduler ####
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__AUTH_MANAGER: 'airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager'
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-api-server:8080/execution/'
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg://airflow:airflow@airflow-metastore/airflow
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+    ### XCOM with GCS backend (requires `apache-airflow-providers-google`) ###
+    AIRFLOW__CORE__XCOM_BACKEND: "airflow.providers.common.io.xcom.backend.XComObjectStorageBackend"
+    AIRFLOW__COMMON_IO__XCOM_OBJECTSTORAGE_PATH: "gs://iobruno-airflow-xcom-backend/xcom"
+    AIRFLOW__COMMON_IO__XCOM_OBJECTSTORAGE_THRESHOLD: "1048576" # (10 MiB)
+    AIRFLOW__COMMON_IO__XCOM_OBJECTSTORAGE_COMPRESSION: "zip"
+    GOOGLE_APPLICATION_CREDENTIALS: "/secrets/gcp_credentials.json"
+  volumes:
+    - ~/.gcp/gcp_credentials.json:/secrets/gcp_credentials.json
+    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
+  depends_on:
+    &airflow-common-depends-on
+    airflow-metastore:
+      condition: service_healthy
+
+services:
+  tlc-db:
+    image: *postgres-image
+    container_name: tlc-db
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB: 'nyc_tlc'
+    ports:
+      - '5432:5432'
+    volumes:
+      - vol-ingest-db:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: on-failure
+
+  airflow-metastore:
+    image: *postgres-image
+    container_name: airflow-metastore
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - '5432'
+    volumes:
+      - vol-airflow3-metastore-localexec:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: on-failure
+
+  # LocalExecutor runs tasks in-process, so the scheduler itself calls the Task Execution API.
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow-scheduler
+    command: ["airflow", "scheduler"]
+    ports:
+      - '8974'
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8974/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: on-failure
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+      airflow-api-server:
+        condition: service_healthy
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    container_name: airflow-dag-processor
+    command: ["airflow", "dag-processor"]
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: on-failure
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-triggerer:
+    <<: *airflow-common
+    container_name: airflow-triggerer
+    command: ["airflow", "triggerer"]
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: on-failure
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  # Runs `db migrate` + FAB permission-sync + admin user creation exactly once, up front.
+  # Every other Airflow process also syncs FAB permissions on its own startup; without this
+  # gate they'd race airflow-init's inserts on a fresh DB (unique-constraint violation, crash-restart).
+  airflow-api-server:
+    <<: *airflow-common
+    container_name: airflow-api-server
+    command: ["airflow", "api-server"]
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/api/v2/version"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: on-failure
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow-init
+    user: "0:0"
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p /sources/logs /sources/dags /sources/plugins
+        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        exec /entrypoint airflow version
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_MIGRATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _PIP_ADDITIONAL_REQUIREMENTS: ''
+    volumes:
+      - ${AIRFLOW_PROJ_DIR:-.}:/sources
+
+volumes:
+  vol-ingest-db:
+    name: vol-ingest-db
+  vol-airflow3-metastore-localexec:
+    name: vol-airflow3-metastore-localexec
