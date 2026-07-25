@@ -14,7 +14,7 @@ Refer to the modules below for covered topics and tools.
 * [IaC with Terraform (Google Cloud Platform)](./infrastructure/gcp/)
 
 ### [Module 2: Workflow orchestration](./module2-workflow-orchestration/)
-* Workflow orchestration with Airflow 3.x
+* [Workflow orchestration with Airflow 3.x](./module2-workflow-orchestration/airflow-3.x/)
 * [Workflow orchestration with Airflow 2.x](./module2-workflow-orchestration/airflow-2.x/)
 * [Workflow orchestration with Prefect](./module2-workflow-orchestration/prefect/)
 
