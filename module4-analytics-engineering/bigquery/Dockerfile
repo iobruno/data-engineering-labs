@@ -1,18 +1,12 @@
-ARG PYTHON_VERSION=3.14
-
 # Builder stage
-FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-trixie-slim AS builder
-
-ARG PYTHON_VERSION
+FROM ghcr.io/astral-sh/uv:python3.14-trixie-slim AS builder
 
 WORKDIR /dbt
 
-ENV UV_PROJECT_ENVIRONMENT=/usr/local \
-    UV_COMPILE_BYTECODE=0 \
+ENV UV_COMPILE_BYTECODE=0 \
     UV_LINK_MODE=copy \
-    UV_PYTHON_DOWNLOADS=never \
-    SITE_PACKAGES=/usr/local/lib/python${PYTHON_VERSION}/site-packages \
-    PYTHONDONTWRITEBYTECODE=1
+    UV_PROJECT_ENVIRONMENT=/usr/local \
+    SITE_PACKAGES=/usr/local/lib/python3.14/site-packages
 
 COPY pyproject.toml uv.lock         ./
 COPY packages.yml package-lock.yml  ./
@@ -26,8 +20,6 @@ COPY seeds                          ./seeds
 COPY snapshots                      ./snapshots
 COPY tests                          ./tests
 
-# --no-install-package: never downloaded, never built. Only reachable from
-# BigFrames/Dataproc Python models and to_dataframe(); this project has neither.
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev \
         --no-install-project \
@@ -49,31 +41,34 @@ RUN --mount=type=cache,target=/root/.cache/uv \
         --no-install-package requests-oauthlib \
         --no-install-package google-auth-oauthlib \
         --no-install-package traitlets \
-        --no-install-package jupyter-core \
-    && rm -rf ${SITE_PACKAGES}/pip ${SITE_PACKAGES}/pip-*.dist-info
+        --no-install-package jupyter-core
 
-RUN dbt deps && rm -rf logs .user.yml
+# Running the CLI also caches its imports' bytecode into site-packages — clean that up too.
+RUN dbt deps \
+    && rm -rf logs .user.yml \
+    && rm -rf ${SITE_PACKAGES}/pip ${SITE_PACKAGES}/pip-*.dist-info \
+    && find ${SITE_PACKAGES} -name '__pycache__' -type d -prune -exec rm -rf {} +
 
 
 # Runner stage
-FROM python:${PYTHON_VERSION}-slim-trixie AS runner
-
-ARG PYTHON_VERSION
+FROM python:3.14-slim-trixie AS runner
 
 WORKDIR /dbt
 
-COPY --from=builder /usr/local/lib/python${PYTHON_VERSION}/site-packages /usr/local/lib/python${PYTHON_VERSION}/site-packages
+COPY --from=builder /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
 COPY --from=builder /usr/local/bin/dbt /usr/local/bin/dbt
 COPY --from=builder /dbt /dbt
 
 ENV DBT_PROFILES_DIR=/dbt/
 ENV GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp_credentials.json
 
-# Read by profiles.yml, models/staging/sources.yml and
-# macros/resolve_destination_schema.sql. Supply these at `docker run`.
+# Read by profiles.yml, models/staging/sources.yml and macros/resolve_destination_schema.sql
 ENV DBT_BIGQUERY_PROJECT=
 ENV DBT_BIGQUERY_SOURCE_DATASET=
 ENV DBT_BIGQUERY_TARGET_DATASET=
 ENV DBT_BIGQUERY_DATASET_LOCATION=
 
-ENTRYPOINT ["sh", "-c", "dbt build --target prod && cp target/run_results.json target/run_results_backup.json && dbt docs generate --target prod && cp target/run_results_backup.json target/run_results.json"]
+ENTRYPOINT dbt build --target prod \
+    && cp target/run_results.json target/run_results.json.bak \
+    && dbt docs generate --target prod \
+    && cp target/run_results.json.bak target/run_results.json
