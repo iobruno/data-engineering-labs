@@ -3,16 +3,16 @@ name = "dbt-bigquery-analytics"
 version = "2.0"
 description = "Analytics engineering with dbt and BigQuery"
 readme = "README.md"
-requires-python = ">=3.12,<3.14"
+requires-python = ">=3.12,<3.15"
 
 dependencies = [
-    "dbt-core>=1.11,<2.0",
-    "dbt-bigquery>=1.11,<2.0",
+    "dbt-core>=1.12,<2.0",
+    "dbt-bigquery>=1.12,<2.0",
 ]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15",
+    "ruff>=0.16",
 ]
 
 [tool.ruff]
