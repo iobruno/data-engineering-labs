@@ -1,14 +1,14 @@
-# dbt and DuckDB for Analytics
+# dbt and DuckLake for Analytics
 
 ![Python](https://img.shields.io/badge/Python-3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
 [![dbt][dbt-shield]](https://docs.getdbt.com/reference/warehouse-setups/bigquery-setup)
 [![uv](https://img.shields.io/badge/astral/uv-261230?style=flat&logo=uv&logoColor=DE5FE9&labelColor=261230)](https://docs.astral.sh/uv/getting-started/installation/)
-[![DuckDB](https://img.shields.io/badge/DuckDB-1A1A1A?style=flat&logo=duckdb&logoColor=FFF100&labelColor=1A1A1A)](https://docs.docker.com/get-docker/)
+[![DuckLake](https://img.shields.io/badge/DuckLake-1A1A1A?style=flat&logo=duckdb&logoColor=2FAFFF&labelColor=1A1A1A)](https://ducklake.select/)
 [![Docker](https://img.shields.io/badge/Docker-329DEE?style=flat&logo=docker&logoColor=white&labelColor=329DEE)](https://docs.docker.com/get-docker/)
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
 
-Analytics engineering project using [`dbt`](https://docs.getdbt.com) + [`dbt-duckdb`](https://docs.getdbt.com/docs/core/connect-data-platform/duckdb-setup) to model [NYC TLC Trip Record](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) Parquet data (Yellow Taxi, Green Taxi, and For-Hire Vehicle) into a Kimball dimensional warehouse. [Staging models](./models/staging/) feed the following dimension and fact tables:
+Analytics engineering project using [dbt-duckdb](https://docs.getdbt.com/docs/core/connect-data-platform/duckdb-setup) to model [NYC TLC Trip Record](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) Parquet data (Yellow Taxi, Green Taxi, and For-Hire Vehicle) into a Kimball dimensional warehouse. [Staging models](./models/staging/) feed the following dimension and fact tables:
 
 - `dim_zone_lookup` — taxi zone dimension (borough, zone, service zone)
 - `fct_taxi_trips` / `fct_fhv_trips` — trip-grain facts for Yellow/Green Taxi and FHV, denormalized with pickup/dropoff borough & zone
@@ -18,6 +18,8 @@ Analytics engineering project using [`dbt`](https://docs.getdbt.com) + [`dbt-duc
 - `fct_fhv_monthly_zone_traveltime_p90` — monthly p90 travel time by pickup/dropoff zone (FHV)
 
 Source data is Parquet-only, queried in place via `dbt-duckdb` straight from GCS, S3, or local filesystem — no raw database or ingestion step in front of it.
+
+The warehouse itself is a [DuckLake](https://ducklake.select/) catalog served over DuckDB's [Quack](https://duckdb.org/docs/current/quack/overview) client/server protocol (see `compose.yaml`), rather than a single `.duckdb` file — so the warehouse can be queried (DBeaver, the `duckdb` CLI, another `dbt` run) while a build is in flight, and by more than one writer at a time.
 
 
 ## Getting Started
@@ -35,15 +37,32 @@ brew install pre-commit
 pre-commit install
 ```
 
-**3.** Setup dbt profiles.yaml accordingly (use the `profiles.tmpl.yml` as template)
+**3.** Start the DuckDB catalog server, the warehouse itself:
+```shell
+docker compose up -d duckdb-server
+```
+This runs the official `duckdb/duckdb` image (see `compose.yaml`), booted with `quack/init.sql`, which loads the Quack extension and calls `quack_serve()` so the DuckDB process behind it can be attached to as a DuckLake catalog by any number of clients — dbt included — instead of being opened as a single-writer local file.
 
-3.1. By default, the profiles_dir is the user '$HOME/.dbt/'
+**4.** Setup dbt profiles.yaml accordingly (use the `profiles.tmpl.yml` as template)
+
+4.1. By default, the profiles_dir is the user '$HOME/.dbt/'
 ```shell
 mkdir -p ~/.dbt/
 cat profiles.tmpl.yml >> ~/.dbt/profiles.yml
 ```
 
-3.2. Set the auth methods (when appliable) and the ENV variables for DuckDB source and destination:
+4.2. Point dbt at the `duckdb-server` container and choose where DuckLake writes its Parquet data. The token must match `QUACK_TOKEN` on the server (`compose.yaml` defaults it to `quack`); host/port default to `localhost:9494`, matching the compose port mapping:
+```shell
+export QUACK_TOKEN=quack
+export DBT_DUCKLAKE_QUACK_HOST=localhost
+export DBT_DUCKLAKE_QUACK_PORT=9494
+export DBT_DUCKLAKE_DATA_PATH=~/.duckdb/warehouse/
+```
+`DBT_DUCKLAKE_DATA_PATH` also accepts `gs://` / `s3://` to make this a genuine lakehouse — the `duckdb-server` container only ever holds catalog metadata, never the Parquet data itself, so it needs no object-store credentials of its own.
+
+> **Note:** `DATA_PATH` is recorded in the catalog the first time you `ATTACH` — changing the env var afterwards does not move existing data (DuckLake's `OVERRIDE_DATA_PATH` does not yet work against a Quack catalog). To point at a different location, attach a fresh catalog (i.e. restart `duckdb-server` against an empty volume).
+
+4.3. Set the auth methods (when applicable) and the ENV variables for the source data DuckDB reads from:
 
 **Google Cloud Storage (gcsfs)** - when attempting to read data from `gcs`, first you must authenticate with:
 ```shell
@@ -67,12 +86,7 @@ export DBT_DUCKDB_SOURCE_PARQUET_BASE_PATH="s3://iobruno-lakehouse-raw/nyc_tlc_d
 export DBT_DUCKDB_SOURCE_PARQUET_BASE_PATH="/path-to/nyc_tlc_dataset/"
 ```
 
-3.3. Set the env var for where DuckDB should store its internal data
-```shell
-export DBT_DUCKDB_TARGET_PATH=~/.duckdb/dbt.duckdb
-```
-
-3.4. (Optional) you can also set the DuckDB schemas where the dbt staging & core models should land on:
+4.4. (Optional) you can also set the DuckDB schemas where the dbt staging & core models should land on:
 ```shell
 # DuckDB schema for the `dim_` and `fct_ models` - defaults to 'main' if not set
 export DBT_DUCKDB_TARGET_SCHEMA=analytics
@@ -81,14 +95,14 @@ export DBT_DUCKDB_TARGET_SCHEMA=analytics
 export DBT_DUCKDB_STAGING_SCHEMA=stg_analytics
 ```
 
-**4.** Install dbt dependencies and trigger the pipeline
+**5.** Install dbt dependencies and trigger the pipeline
 
-4.1. Run `dbt deps` to install  dbt plugins
+5.1. Run `dbt deps` to install  dbt plugins
 ```shell
 dbt deps
 ```
 
-4.2. Run dbt build to trigger the dbt models to run
+5.2. Run dbt build to trigger the dbt models to run
 ```shell
 dbt build
 
@@ -99,10 +113,10 @@ dbt build
 dbt build --select +models/staging
 
 ## models/staging+: Runs the target models first, and then all models that depend on it
-dbt build --select models/stagigng+
+dbt build --select models/staging+
 ```
 
-**5.** Generate the Docs and the Data Lineage graph with:
+**6.** Generate the Docs and the Data Lineage graph with:
 ```shell
 dbt docs generate
 dbt docs serve
@@ -115,7 +129,7 @@ open http://localhost:8080
 
 
 ## Containerization
-- T.B.D.
+The warehouse (`duckdb-server`) runs containerized via `compose.yaml`, as described in step 3 above. Containerizing the `dbt` CLI run itself is T.B.D.
 
 
 ## TODO's:
@@ -123,6 +137,7 @@ open http://localhost:8080
 - [x] Bootstrap dbt with DuckDB Adapter ([dbt-duckdb](https://github.com/duckdb/dbt-duckdb))
 - [x] Configure dbt-duckdb with `fsspec` and read from [gcsfs](https://gcsfs.readthedocs.io/en/latest/api.html?highlight=GCSFileSystem#gcsfs.core.GCSFileSystem)
 - [x] Configure dbt-duckdb with `fsspec` and read from [s3fs](https://s3fs.readthedocs.io/en/latest/api.html#s3fs.core.S3FileSystem)
+- [x] Run the warehouse as a client/server daemon with [DuckLake](https://ducklake.select/) on a [Quack](https://duckdb.org/docs/current/quack/overview)-served DuckDB catalog
 - [x] Implement Data Observability with [elementary-data](https://github.com/elementary-data/elementary)
 - [ ] Implement Data Quality metrics it with [dbt-expectations](https://github.com/metaplane/dbt-expectations/)
 
