@@ -3,12 +3,16 @@ ARG PYTHON_VERSION=3.14
 # Builder stage
 FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-trixie-slim AS builder
 
+ARG PYTHON_VERSION
+
 WORKDIR /dbt
 
 ENV UV_PROJECT_ENVIRONMENT=/usr/local \
-    UV_COMPILE_BYTECODE=1 \
+    UV_COMPILE_BYTECODE=0 \
     UV_LINK_MODE=copy \
-    UV_PYTHON_DOWNLOADS=never
+    UV_PYTHON_DOWNLOADS=never \
+    SITE_PACKAGES=/usr/local/lib/python${PYTHON_VERSION}/site-packages \
+    PYTHONDONTWRITEBYTECODE=1
 
 COPY pyproject.toml uv.lock         ./
 COPY packages.yml package-lock.yml  ./
@@ -37,9 +41,18 @@ RUN --mount=type=cache,target=/root/.cache/uv \
         --no-install-package numpy \
         --no-install-package pandas-gbq \
         --no-install-package db-dtypes \
-        --no-install-package pydata-google-auth
+        --no-install-package pydata-google-auth \
+        # orphaned by the exclusions above — not independent choices
+        --no-install-package setuptools \
+        --no-install-package websockets \
+        --no-install-package oauthlib \
+        --no-install-package requests-oauthlib \
+        --no-install-package google-auth-oauthlib \
+        --no-install-package traitlets \
+        --no-install-package jupyter-core \
+    && rm -rf ${SITE_PACKAGES}/pip ${SITE_PACKAGES}/pip-*.dist-info
 
-RUN dbt deps
+RUN dbt deps && rm -rf logs .user.yml
 
 
 # Runner stage
@@ -50,7 +63,7 @@ ARG PYTHON_VERSION
 WORKDIR /dbt
 
 COPY --from=builder /usr/local/lib/python${PYTHON_VERSION}/site-packages /usr/local/lib/python${PYTHON_VERSION}/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /usr/local/bin/dbt /usr/local/bin/dbt
 COPY --from=builder /dbt /dbt
 
 ENV DBT_PROFILES_DIR=/dbt/
