@@ -90,7 +90,7 @@ dbt build
 dbt build --select +models/staging
 
 ## models/staging+: Runs the target models first, and then all models that depend on it
-dbt build --select models/staging+
+dbt build --select models/stagigng+
 ```
 
 **5.** Generate the Docs and the Data Lineage graph with:
@@ -106,23 +106,7 @@ open http://localhost:8080
 
 
 ## Containerization
-
-**1.** Build the Docker Image with:
-```shell
-docker build -t dbt-duckdb:latest . --no-cache
-```
-
-**2.** Start a container with it:
-```shell
-docker run --rm \
-  -e DBT_DUCKDB_SOURCE_PARQUET_BASE_PATH="gs://iobruno-lakehouse-raw/nyc_tlc_dataset/" \
-  -e DBT_DUCKDB_TARGET_PATH=/duckdb/dbt.duckdb \
-  -e DBT_DUCKDB_TARGET_SCHEMA=analytics \
-  -v ~/.duckdb:/duckdb \
-  -v PATH/TO/YOUR/gcp_credentials.json:/secrets/gcp_credentials.json \
-  --name dbt-duckdb \
-  dbt-duckdb
-```
+- T.B.D.
 
 
 ## TODO's:
