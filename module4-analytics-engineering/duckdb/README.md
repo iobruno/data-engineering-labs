@@ -66,10 +66,10 @@ export DBT_DUCKDB_TARGET_PATH=~/.duckdb/dbt.duckdb
 3.4. (Optional) you can also set the DuckDB schemas where the dbt staging & core models should land on:
 ```shell
 # DuckDB schema for the `dim_` and `fct_ models` - defaults to 'main' if not set
-export DBT_DUCKDB_TARGET_SCHEMA=analytics=
+export DBT_DUCKDB_TARGET_SCHEMA=analytics
 
 # DuckDB for the stg_ models - defaults to 'main' if not set
-export DBT_DUCKDB_STAGING_SCHEMA=stg_analytics=
+export DBT_DUCKDB_STAGING_SCHEMA=stg_analytics
 ```
 
 **4.** Install dbt dependencies and trigger the pipeline
