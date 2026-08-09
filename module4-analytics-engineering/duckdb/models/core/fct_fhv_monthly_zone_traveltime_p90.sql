@@ -11,7 +11,7 @@ with fhv_timedelta as (
         quantile_cont(datediff('second', pickup_datetime, dropoff_datetime), 0.90)
             over (partition by pickup_year, pickup_month, pickup_zone, dropoff_zone) as timedelta_p90
     from
-        {{ ref('dim_fhv_trips') }}
+        {{ ref('fct_fhv_trips') }}
 ),
 
 fhv_rnk_timedelta as (

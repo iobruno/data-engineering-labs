@@ -3,19 +3,19 @@ name = "dbt-duckdb-analytics"
 version = "2.0"
 description = "Analytics engineering with dbt and duckdb"
 readme = "README.md"
-requires-python = ">=3.12,<3.14"
+requires-python = ">=3.12,<3.15"
 
 dependencies = [
-    "duckdb>=1.4.4,<2.0",
-    "dbt-core>=1.11,<2.0",
-    "dbt-duckdb>=1.10,<2.0",
-    "s3fs==2026.2.0",
-    "gcsfs==2026.2.0",
+    "duckdb>=1.5.5,<2.0",
+    "dbt-core>=1.12,<2.0",
+    "dbt-duckdb>=1.11,<2.0",
+    "s3fs==2026.7.0",
+    "gcsfs==2026.7.0",
 ]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15",
+    "ruff>=0.16",
 ]
 
 [tool.ruff]

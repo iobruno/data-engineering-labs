@@ -12,7 +12,7 @@ with fare_percentile as (
         quantile_disc(fare_amount, 0.95) over (partition by service_type, pickup_year, pickup_month) as p95,
         quantile_disc(fare_amount, 0.90) over (partition by service_type, pickup_year, pickup_month) as p90
     from
-        {{ ref('dim_taxi_trips') }}
+        {{ ref('fct_taxi_trips') }}
     where
         fare_amount > 0
         and trip_distance > 0
