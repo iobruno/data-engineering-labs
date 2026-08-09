@@ -10,7 +10,7 @@ with quarterly_trips as (
         count(1)                    as num_trips,
         sum(total_amount)           as revenue
     from
-        {{ ref('dim_taxi_trips') }}
+        {{ ref('fct_taxi_trips') }}
     group by
         service_type,
         year,
