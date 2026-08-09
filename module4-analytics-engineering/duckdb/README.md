@@ -21,6 +21,8 @@ Source data is Parquet-only, queried in place via `dbt-duckdb` straight from GCS
 
 The warehouse itself is a [DuckLake](https://ducklake.select/) catalog served over DuckDB's [Quack](https://duckdb.org/docs/current/quack/overview) client/server protocol (see `compose.yaml`), rather than a single `.duckdb` file — so the warehouse can be queried (DBeaver, the `duckdb` CLI, another `dbt` run) while a build is in flight, and by more than one writer at a time.
 
+> **Note:** `dim_*`/`fct_*` are materialized tables and can be queried from any client (DataGrip, DBeaver, the DuckDB UI). The `stg_*` models are **views** over the source Parquet on GCS/S3, so querying them re-reads the source in the caller's own session — which only dbt has credentials for (`filesystems:` in `profiles.tmpl.yml`). External SQL clients will get `403 Forbidden` on `stg_*`; query the materialized `dim_*`/`fct_*` models instead, or run the equivalent SQL through dbt.
+
 
 ## Getting Started
 
@@ -130,6 +132,16 @@ open http://localhost:8080
 
 ## Containerization
 The warehouse (`duckdb-server`) runs containerized via `compose.yaml`, as described in step 3 above. Containerizing the `dbt` CLI run itself is T.B.D.
+
+
+## Connecting External Clients
+SQL clients using the DuckDB JDBC driver (DataGrip, DBeaver, ...) can attach to the warehouse via `quack/external_client_init.sql` as the session init script, mirroring what `profiles.tmpl.yml` does for dbt:
+
+```
+jdbc:duckdb:;session_init_sql_file=/path/to/external_client_init.sql;jdbc_stream_results=true;jdbc_pin_db=true;
+```
+
+As noted above, this only gets you `dim_*`/`fct_*` tables — `stg_*` views still require dbt's GCS credentials.
 
 
 ## TODO's:

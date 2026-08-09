@@ -16,9 +16,7 @@ services:
       - ./quack/init.sql:/data/.duckdbrc:ro
       - vol-duckdb-catalog:/data
     healthcheck:
-      # CMD-SHELL runs via /bin/sh -c, which doesn't exist in this distroless image
-      # exec-form CMD (no shell) is required instead.
-      test: ["CMD", "/duckdb", "-c", "SELECT 1"]
+      test: ["CMD", "/duckdb", "-c", "SELECT 1"] # CMD-SHELL runs via /bin/sh -c, which doesn't exist in this distroless image
       interval: 5s
       timeout: 5s
       retries: 5
