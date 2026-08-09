@@ -8,7 +8,16 @@
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
 
-Analytics engineering project built with [`dbt`](https://docs.getdbt.com) and the [`dbt-duckdb`](https://docs.getdbt.com/docs/core/connect-data-platform/duckdb-setup) adapter that transforms [NYC TLC Trip Record](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) Parquet data into a Kimball dimensional model — from raw ingestion through staging views to materialized dimensions and fact tables covering zone-level revenue, fare percentiles, travel time distributions, and year-over-year growth across Yellow Taxi, Green Taxi, and For-Hire Vehicle services. Supports sourcing data from GCS, S3, or local filesystem.
+Analytics engineering project using [`dbt`](https://docs.getdbt.com) + [`dbt-duckdb`](https://docs.getdbt.com/docs/core/connect-data-platform/duckdb-setup) to model [NYC TLC Trip Record](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) Parquet data (Yellow Taxi, Green Taxi, and For-Hire Vehicle) into a Kimball dimensional warehouse. [Staging models](./models/staging/) feed the following dimension and fact tables:
+
+- `dim_zone_lookup` — taxi zone dimension (borough, zone, service zone)
+- `fct_taxi_trips` / `fct_fhv_trips` — trip-grain facts for Yellow/Green Taxi and FHV, denormalized with pickup/dropoff borough & zone
+- `fct_taxi_monthly_zone_revenue` — monthly fare/tip/toll/surcharge revenue by pickup zone (Yellow/Green Taxi)
+- `fct_taxi_trips_quarterly_revenue` — quarterly revenue with year-over-year growth (Yellow/Green Taxi)
+- `fct_taxi_trips_monthly_fare_p95` — monthly p90/p95/p97 fare percentiles (Yellow/Green Taxi)
+- `fct_fhv_monthly_zone_traveltime_p90` — monthly p90 travel time by pickup/dropoff zone (FHV)
+
+Source data is Parquet-only, queried in place via `dbt-duckdb` straight from GCS, S3, or local filesystem — no raw database or ingestion step in front of it.
 
 
 ## Getting Started
