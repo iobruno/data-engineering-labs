@@ -62,10 +62,10 @@ dbt build
 
 ## +models/staging: Runs the dependencies/preceding models first that lead 
 ## to 'models/staging', and then the target models
-dbt [build|run] --select +models/staging
+dbt build --select +models/staging
 
 ## models/staging+: Runs the target models first, and then all models that depend on it
-dbt [build|run] --select models/staging+
+dbt build --select models/staging+
 ```
 
 **5.** Generate the Docs and the Data Lineage graph with:
@@ -90,12 +90,12 @@ docker build -t dbt-bigquery:latest .
 
 **2.** Start a container with it:
 ```shell
-docker run -d --rm \
+docker run --rm \
   -e DBT_BIGQUERY_PROJECT=iobruno-gcp-labs \
   -e DBT_BIGQUERY_SOURCE_DATASET=raw_nyc_tlc_trip_data \
   -e DBT_BIGQUERY_TARGET_DATASET=nyc_tlc_trip_data \
   -e DBT_BIGQUERY_DATASET_LOCATION=us-central1 \
-  -v /PATH/TO/YOUR/gcp_credentials.json:/secrets/gcp_credentials.json \
+  -v ${GOOGLE_APPLICATION_CREDENTIALS}:/secrets/gcp_credentials.json \
   --name dbt-bigquery \
   dbt-bigquery
 ```
@@ -107,8 +107,8 @@ docker run -d --rm \
 - [x] Generate and serve docs and Data Lineage Graphs locally
 - [x] Add dbt macro to configure target schemas dinamically
 - [x] Run `dbt-core` in Docker
-- [ ] Implement Data Quality metrics it with [dbt-expectations](https://github.com/calogica/dbt-expectations)
-- [ ] Implement Data Observability with [elementary-data](https://github.com/elementary-data/elementary)
+- [x] Implement Data Observability with [elementary-data](https://github.com/elementary-data/elementary)
+- [ ] Implement Data Quality metrics it with [dbt-expectations](https://github.com/metaplane/dbt-expectations/)
 
 
 <!-- Reference-style image def, kept out of the badge row above -->

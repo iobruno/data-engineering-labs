@@ -7,5 +7,5 @@ packages:
     ## Docs: https://github.com/metaplane/dbt-expectations/
 
   - package: elementary-data/elementary
-    version: ["0.25.1", "<0.26.0"]
-    ## Docs: https://docs.elementary-data.com
+    version: [">=0.25.1", "<0.26.0"]
+    ## Docs: https://docs.elementary-data.com/data-tests/dbt/dbt-package

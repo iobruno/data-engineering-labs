@@ -28,3 +28,8 @@ models:
       +materialized: view
     core:
       +materialized: table
+
+  # Sets schema for elementary-data's metadata tables, otherwise it defaults to target.schema
+  # Docs: https://docs.elementary-data.com/data-tests/dbt/dbt-package
+  elementary:
+    +schema: elementary
