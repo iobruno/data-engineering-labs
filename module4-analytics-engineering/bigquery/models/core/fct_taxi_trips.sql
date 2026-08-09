@@ -9,9 +9,14 @@ with taxi_trips as (
 ),
 
 lookup_zones as (
-    select location_id, borough, zone
-    from {{ ref('dim_zone_lookup') }}
-    where borough != 'Unknown'
+    select
+        location_id,
+        borough,
+        zone
+    from
+        {{ ref('dim_zone_lookup') }}
+    where
+        borough != 'Unknown'
 )
 
 select

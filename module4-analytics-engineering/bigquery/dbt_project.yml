@@ -1,6 +1,7 @@
 name: 'dbt_bigquery_analytics'
-version: '1.0.0'
+
 config-version: 2
+version: '2.0'
 
 profile: 'dbt_bigquery_analytics'
 
@@ -18,13 +19,14 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
-
-# In this example config, we tell dbt to build all models in the example/
-# directory as views. These settings can be overridden in the individual model
-# files using the `{{ config(...) }}` macro.
 models:
   dbt_bigquery_analytics:
     staging:
       +materialized: view
     core:
       +materialized: table
+
+  # Sets schema for elementary-data's metadata tables, otherwise it defaults to target.schema
+  # Docs: https://docs.elementary-data.com/data-tests/dbt/dbt-package
+  elementary:
+    +schema: elementary

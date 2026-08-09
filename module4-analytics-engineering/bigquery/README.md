@@ -1,13 +1,21 @@
 # dbt and BigQuery for Analytics
 
-![Python](https://img.shields.io/badge/Python-3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
-[![dbt](https://img.shields.io/badge/dbt--bigquery-1.11-262A38?style=flat&labelColor=262A38&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9IiNmZjY5NGIiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE3LjkgOS4zOGE4IDggMCAwIDAtMy4wNC0zLjEybDEuNzcuODNhMTAgMTAgMCAwIDEgMy43NCAzbDMuMjMtNS45M2EyLjkgMi45IDAgMCAwLS4wNi0yLjk2IDIuNzMgMi43MyAwIDAgMC0zLjU2LS44N0wxNC4xIDMuNTRhNC40IDQuNCAwIDAgMS00LjE4IDBMNC4xOC40MWEyLjkgMi45IDAgMCAwLTIuOTYuMDYgMi43MyAyLjczIDAgMCAwLS44OCAzLjU3TDMuNTYgOS45YTQuNCA0LjQgMCAwIDEgMCA0LjE4TC40MiAxOS44M2EyLjkgMi45IDAgMCAwIC4wOSAzIDIuNzMgMi43MyAwIDAgMCAzLjU0Ljg0bDYuMDYtMy4zYTEwIDEwIDAgMCAxLTMtMy43NmwtLjg0LTEuNzdhOCA4IDAgMCAwIDMuMTIgMy4wNWwxMC41OCA1Ljc4YTIuNzMgMi43MyAwIDAgMCAzLjU1LS44NCAyLjkgMi45IDAgMCAwIC4wOC0zem0zLjM4LTcuNzRhMS4wOSAxLjA5IDAgMSAxIDAgMi4xOCAxLjA5IDEuMDkgMCAwIDEgMC0yLjE4TTIuNzQgMy44MmExLjA5IDEuMDkgMCAxIDEgMC0yLjE4IDEuMDkgMS4wOSAwIDAgMSAwIDIuMThtMCAxOC41NGExLjA5IDEuMDkgMCAxIDEgMC0yLjE4IDEuMDkgMS4wOSAwIDAgMSAwIDIuMThNMTMuMSAxMC45YTIuMTcgMi4xNyAwIDAgMC0yLjE4IDIuMTcgMi4yIDIuMiAwIDAgMCAuNyAxLjYgMi43MiAyLjcyIDAgMSAxIC43Ny01LjM4IDIuNyAyLjcgMCAwIDEgMi4zIDIuMzIgMi4yIDIuMiAwIDAgMC0xLjU5LS43MW04LjE4IDExLjQ1YTEuMDkgMS4wOSAwIDEgMSAwLTIuMTggMS4wOSAxLjA5IDAgMCAxIDAgMi4xOCIvPjwvc3ZnPgo=)](https://docs.getdbt.com/reference/warehouse-setups/bigquery-setup)
+![Python](https://img.shields.io/badge/Python-3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
+[![dbt][dbt-shield]](https://docs.getdbt.com/reference/warehouse-setups/bigquery-setup)
 [![uv](https://img.shields.io/badge/astral/uv-261230?style=flat&logo=uv&logoColor=DE5FE9&labelColor=261230)](https://docs.astral.sh/uv/getting-started/installation/)
+[![BigQuery](https://img.shields.io/badge/BigQuery-3772FF?style=flat&logo=googlebigquery&logoColor=white&labelColor=3772FF)](https://console.cloud.google.com/bigquery)
 [![Docker](https://img.shields.io/badge/Docker-329DEE?style=flat&logo=docker&logoColor=white&labelColor=329DEE)](https://docs.docker.com/get-docker/)
 
 ![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-31393F?style=flat&logo=creativecommons&logoColor=black&labelColor=white)
 
-Analytics engineering project built with [`dbt`](https://docs.getdbt.com) and the [`dbt-bigquery`](https://docs.getdbt.com/docs/core/connect-data-platform/bigquery-setup) adapter that transforms [NYC TLC Trip Record](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) Parquet data into a Kimball dimensional model — from raw ingestion through staging views to materialized dimensions and fact tables covering zone-level revenue, fare percentiles, travel time distributions, and year-over-year growth across Yellow Taxi, Green Taxi, and For-Hire Vehicle services.
+Analytics engineering project using [dbt-bigquery](https://docs.getdbt.com/docs/core/connect-data-platform/bigquery-setup) to model [NYC TLC Trip Record](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) Parquet data (Yellow Taxi, Green Taxi, and For-Hire Vehicle) into a Kimball dimensional warehouse. [Staging models](./models/staging/) feed the following dimension and fact tables:
+
+- `dim_zone_lookup` — taxi zone dimension (borough, zone, service zone)
+- `fct_taxi_trips` / `fct_fhv_trips` — trip-grain facts for Yellow/Green Taxi and FHV, denormalized with pickup/dropoff borough & zone
+- `fct_taxi_monthly_zone_revenue` — monthly fare/tip/toll/surcharge revenue by pickup zone (Yellow/Green Taxi)
+- `fct_taxi_trips_quarterly_revenue` — quarterly revenue with year-over-year growth (Yellow/Green Taxi)
+- `fct_taxi_trips_monthly_fare_p95` — monthly p90/p95/p97 fare percentiles (Yellow/Green Taxi)
+- `fct_fhv_monthly_zone_traveltime_p90` — monthly p90 travel time by pickup/dropoff zone (FHV)
 
 
 ## Getting Started
@@ -61,10 +69,10 @@ dbt build
 
 ## +models/staging: Runs the dependencies/preceding models first that lead 
 ## to 'models/staging', and then the target models
-dbt [build|run] --select +models/staging
+dbt build --select +models/staging
 
 ## models/staging+: Runs the target models first, and then all models that depend on it
-dbt [build|run] --select models/staging+
+dbt build --select models/staging+
 ```
 
 **5.** Generate the Docs and the Data Lineage graph with:
@@ -84,17 +92,17 @@ open http://localhost:8080
 **1.** Build the Docker Image with:
 
 ```shell
-docker build -t dbt-bigquery:latest . --no-cache
+docker build -t dbt-bigquery:latest .
 ```
 
 **2.** Start a container with it:
 ```shell
-docker run -d --rm \
+docker run --rm \
   -e DBT_BIGQUERY_PROJECT=iobruno-gcp-labs \
   -e DBT_BIGQUERY_SOURCE_DATASET=raw_nyc_tlc_trip_data \
   -e DBT_BIGQUERY_TARGET_DATASET=nyc_tlc_trip_data \
   -e DBT_BIGQUERY_DATASET_LOCATION=us-central1 \
-  -v /PATH/TO/YOUR/gcp_credentials.json:/secrets/gcp_credentials.json \
+  -v ${GOOGLE_APPLICATION_CREDENTIALS}:/secrets/gcp_credentials.json \
   --name dbt-bigquery \
   dbt-bigquery
 ```
@@ -106,5 +114,9 @@ docker run -d --rm \
 - [x] Generate and serve docs and Data Lineage Graphs locally
 - [x] Add dbt macro to configure target schemas dinamically
 - [x] Run `dbt-core` in Docker
-- [ ] Implement Data Quality metrics it with [dbt-expectations](https://github.com/calogica/dbt-expectations)
-- [ ] Implement Data Observability with [elementary-data](https://github.com/elementary-data/elementary)
+- [x] Implement Data Observability with [elementary-data](https://github.com/elementary-data/elementary)
+- [ ] Implement Data Quality metrics it with [dbt-expectations](https://github.com/metaplane/dbt-expectations/)
+
+
+<!-- Reference-style image def, kept out of the badge row above -->
+[dbt-shield]: https://img.shields.io/badge/dbt--core-1.12-262A38?style=flat&labelColor=262A38&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9IiNmZjY5NGIiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE3LjkgOS4zOGE4IDggMCAwIDAtMy4wNC0zLjEybDEuNzcuODNhMTAgMTAgMCAwIDEgMy43NCAzbDMuMjMtNS45M2EyLjkgMi45IDAgMCAwLS4wNi0yLjk2IDIuNzMgMi43MyAwIDAgMC0zLjU2LS44N0wxNC4xIDMuNTRhNC40IDQuNCAwIDAgMS00LjE4IDBMNC4xOC40MWEyLjkgMi45IDAgMCAwLTIuOTYuMDYgMi43MyAyLjczIDAgMCAwLS44OCAzLjU3TDMuNTYgOS45YTQuNCA0LjQgMCAwIDEgMCA0LjE4TC40MiAxOS44M2EyLjkgMi45IDAgMCAwIC4wOSAzIDIuNzMgMi43MyAwIDAgMCAzLjU0Ljg0bDYuMDYtMy4zYTEwIDEwIDAgMCAxLTMtMy43NmwtLjg0LTEuNzdhOCA4IDAgMCAwIDMuMTIgMy4wNWwxMC41OCA1Ljc4YTIuNzMgMi43MyAwIDAgMCAzLjU1LS44NCAyLjkgMi45IDAgMCAwIC4wOC0zem0zLjM4LTcuNzRhMS4wOSAxLjA5IDAgMSAxIDAgMi4xOCAxLjA5IDEuMDkgMCAwIDEgMC0yLjE4TTIuNzQgMy44MmExLjA5IDEuMDkgMCAxIDEgMC0yLjE4IDEuMDkgMS4wOSAwIDAgMSAwIDIuMThtMCAxOC41NGExLjA5IDEuMDkgMCAxIDEgMC0yLjE4IDEuMDkgMS4wOSAwIDAgMSAwIDIuMThNMTMuMSAxMC45YTIuMTcgMi4xNyAwIDAgMC0yLjE4IDIuMTcgMi4yIDIuMiAwIDAgMCAuNyAxLjYgMi43MiAyLjcyIDAgMSAxIC43Ny01LjM4IDIuNyAyLjcgMCAwIDEgMi4zIDIuMzIgMi4yIDIuMiAwIDAgMC0xLjU5LS43MW04LjE4IDExLjQ1YTEuMDkgMS4wOSAwIDEgMSAwLTIuMTggMS4wOSAxLjA5IDAgMCAxIDAgMi4xOCIvPjwvc3ZnPgo=
