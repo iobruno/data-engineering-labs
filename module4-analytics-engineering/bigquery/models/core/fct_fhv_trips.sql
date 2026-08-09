@@ -3,9 +3,15 @@
 ) }}
 
 with lookup_zones as (
-    select location_id, borough, zone, service_zone
-    from {{ ref('dim_zone_lookup') }}
-    where borough != 'Unknown'
+    select
+        location_id,
+        borough,
+        zone,
+        service_zone
+    from
+        {{ ref('dim_zone_lookup') }}
+    where
+        borough != 'Unknown'
 )
 
 select
