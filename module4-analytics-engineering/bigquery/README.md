@@ -85,7 +85,7 @@ open http://localhost:8080
 **1.** Build the Docker Image with:
 
 ```shell
-docker build -t dbt-bigquery:latest . --no-cache
+docker build -t dbt-bigquery:latest .
 ```
 
 **2.** Start a container with it:
