@@ -22,6 +22,25 @@ services:
       retries: 5
     restart: on-failure
 
+  duckdb-ui:
+    image: *duckdb-image
+    container_name: duckdb-ui
+    command: |
+      /duckdb
+      -init /data/client_init.sql
+      -cmd 'INSTALL ui; LOAD ui; CALL start_ui();'
+    stdin_open: true
+    environment:
+      HOME: /data  # extensions install under $HOME/.duckdb
+    volumes:
+      - ./quack/client_init.sql:/data/client_init.sql:ro
+      - ${DBT_DUCKLAKE_DATA_PATH:-$HOME/.duckdb/warehouse}:${DBT_DUCKLAKE_DATA_PATH:-$HOME/.duckdb/warehouse}:ro
+    depends_on:
+      duckdb-server:
+        condition: service_healthy
+    network_mode: host
+    restart: on-failure
+
 volumes:
   vol-duckdb-catalog:
     name: vol-duckdb-catalog

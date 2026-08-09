@@ -135,13 +135,15 @@ The warehouse (`duckdb-server`) runs containerized via `compose.yaml`, as descri
 
 
 ## Connecting External Clients
-SQL clients using the DuckDB JDBC driver (DataGrip, DBeaver, ...) can attach to the warehouse via `quack/external_client_init.sql` as the session init script, mirroring what `profiles.tmpl.yml` does for dbt:
+SQL clients using the DuckDB JDBC driver (DataGrip, DBeaver, ...) can attach to the warehouse via `quack/client_init.sql` as the session init script, mirroring what `profiles.tmpl.yml` does for dbt:
 
 ```
-jdbc:duckdb:;session_init_sql_file=/path/to/external_client_init.sql;jdbc_stream_results=true;jdbc_pin_db=true;
+jdbc:duckdb:;session_init_sql_file=/path/to/client_init.sql;jdbc_stream_results=true;jdbc_pin_db=true;
 ```
 
 As noted above, this only gets you `dim_*`/`fct_*` tables — `stg_*` views still require dbt's GCS credentials.
+
+Alternatively, `docker compose up -d duckdb-ui` starts a container that runs the same bootstrap plus DuckDB's web UI, browsable at `http://localhost:4213`.
 
 
 ## TODO's:
