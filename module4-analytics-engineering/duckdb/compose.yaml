@@ -1,0 +1,29 @@
+x-duckdb-image: &duckdb-image duckdb/duckdb:${DUCKDB_VERSION:-1.5.5}
+
+services:
+  duckdb-server:
+    image: *duckdb-image
+    container_name: duckdb-server
+    command: |
+      /duckdb /data/catalog.ducklake
+    stdin_open: true
+    environment:
+      HOME: /data  # auto-loads /data/.duckdbrc on startup (the mounted quack/init.sql)
+      QUACK_TOKEN: "${QUACK_TOKEN:-quack}"
+    ports:
+      - "9494:9494"
+    volumes:
+      - ./quack/init.sql:/data/.duckdbrc:ro
+      - vol-duckdb-catalog:/data
+    healthcheck:
+      # CMD-SHELL runs via /bin/sh -c, which doesn't exist in this distroless image
+      # exec-form CMD (no shell) is required instead.
+      test: ["CMD", "/duckdb", "-c", "SELECT 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: on-failure
+
+volumes:
+  vol-duckdb-catalog:
+    name: vol-duckdb-catalog
