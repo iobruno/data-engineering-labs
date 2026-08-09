@@ -1,4 +1,4 @@
-# dbt and DuckLake for Analytics
+# dbt and DuckLake+Quack for Analytics
 
 ![Python](https://img.shields.io/badge/Python-3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
 [![dbt][dbt-shield]](https://docs.getdbt.com/reference/warehouse-setups/bigquery-setup)
