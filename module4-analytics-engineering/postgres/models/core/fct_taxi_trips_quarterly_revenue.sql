@@ -35,6 +35,6 @@ select
     quarter                         as quarter,
     num_trips                       as num_trips,
     revenue                         as revenue,
-    round(safe_divide(revenue - prev_year_revenue, prev_year_revenue) * 100, 2) as growth
+    round((revenue - prev_year_revenue) / nullif(prev_year_revenue, 0) * 100, 2) as growth
 from
     quarterly_trips_with_prev
