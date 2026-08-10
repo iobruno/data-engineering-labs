@@ -32,6 +32,7 @@ services:
     stdin_open: true
     environment:
       HOME: /data  # extensions install under $HOME/.duckdb
+      DBT_DUCKLAKE_DATA_PATH: ${DBT_DUCKLAKE_DATA_PATH:-$HOME/.duckdb/warehouse}
     volumes:
       - ./quack/client_init.sql:/data/client_init.sql:ro
       - ${DBT_DUCKLAKE_DATA_PATH:-$HOME/.duckdb/warehouse}:${DBT_DUCKLAKE_DATA_PATH:-$HOME/.duckdb/warehouse}:ro

@@ -16,10 +16,5 @@ ATTACH 'ducklake:quack:localhost:9494' AS warehouse (
     META_DISABLE_SSL true
 );
 
--- To browse the warehouse in DuckDB's built-in web UI instead of a SQL client, run:
---   INSTALL ui; LOAD ui; CALL start_ui();
--- then open http://localhost:4213. The `duckdb-ui` service in compose.yaml runs exactly
--- this via `-cmd`, which is why it stays commented out here.
-
 /* DUCKDB_CONNECTION_INIT_BELOW_MARKER */
 USE warehouse;
