@@ -1,4 +1,4 @@
-# dbt and DuckLake+Quack for Analytics
+# dbt and DuckLake + Quack for Analytics
 
 ![Python](https://img.shields.io/badge/Python-3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
 [![dbt][dbt-shield]](https://docs.getdbt.com/reference/warehouse-setups/bigquery-setup)
@@ -151,7 +151,7 @@ Alternatively, `docker compose up -d duckdb-ui` starts a container that runs the
 - [x] Bootstrap dbt with DuckDB Adapter ([dbt-duckdb](https://github.com/duckdb/dbt-duckdb))
 - [x] Configure dbt-duckdb with `fsspec` and read from [gcsfs](https://gcsfs.readthedocs.io/en/latest/api.html?highlight=GCSFileSystem#gcsfs.core.GCSFileSystem)
 - [x] Configure dbt-duckdb with `fsspec` and read from [s3fs](https://s3fs.readthedocs.io/en/latest/api.html#s3fs.core.S3FileSystem)
-- [x] Run the warehouse as a client/server daemon with [DuckLake](https://ducklake.select/) on a [Quack](https://duckdb.org/docs/current/quack/overview)-served DuckDB catalog
+- [x] Run the Warehouse with [DuckLake](https://ducklake.select/) + [Quack](https://duckdb.org/docs/current/quack/overview)-served DuckDB catalog
 - [x] Implement Data Observability with [elementary-data](https://github.com/elementary-data/elementary)
 - [ ] Implement Data Quality metrics it with [dbt-expectations](https://github.com/metaplane/dbt-expectations/)
 
