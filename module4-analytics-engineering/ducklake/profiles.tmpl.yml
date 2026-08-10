@@ -1,0 +1,70 @@
+dbt_duckdb_analytics:
+  outputs:
+    # The warehouse is a DuckLake catalog served by the `duckdb-server` container
+    # (see compose.yaml) over the Quack protocol, not a local .duckdb file --
+    # this lets other clients (DBeaver, the duckdb CLI, another dbt run) read/write
+    # the warehouse concurrently instead of locking it to a single process.
+    #
+    # Docs:
+    #  - https://duckdb.org/docs/current/quack/overview       (client/server protocol)
+    #  - https://ducklake.select/                              (catalog + Parquet table format)
+    #  - https://filesystem-spec.readthedocs.io/en/latest/api.html#fsspec.implementations.local.LocalFileSystem
+    #  - https://gcsfs.readthedocs.io/en/latest/api.html?highlight=GCSFileSystem#gcsfs.core.GCSFileSystem
+    #  - https://s3fs.readthedocs.io/en/latest/api.html#s3fs.core.S3FileSystem
+    dev:
+      type: duckdb
+      path: ":memory:"
+      database: warehouse
+      threads: 4
+      extensions:
+        - quack
+        - ducklake
+      secrets:
+        - type: quack
+          token: "{{ env_var('QUACK_TOKEN', 'quack') }}"
+      attach:
+        - path: "ducklake:quack:{{ env_var('DBT_DUCKLAKE_QUACK_HOST', 'localhost') }}:{{ env_var('DBT_DUCKLAKE_QUACK_PORT', '9494') }}"
+          alias: warehouse
+          is_ducklake: true
+          options:
+            data_path: "{{ env_var('DBT_DUCKLAKE_DATA_PATH', './warehouse/') }}"
+            meta_disable_ssl: true # Quack defaults to HTTPS for any non-'localhost' hostname; this server is plaintext (see quack/init.sql's disable_ssl => true).
+      filesystems:
+        - fs: gcs
+          access: read_write
+          token: google_default
+          cache_timeout: 0
+        - fs: s3
+          anon: false
+          key: "{{ env_var('AWS_ACCESS_KEY', '') }}"
+          secret: "{{ env_var('AWS_SECRET_ACCESS_KEY', '') }}"
+
+    prod:
+      type: duckdb
+      path: ":memory:"
+      database: warehouse
+      threads: 4
+      extensions:
+        - quack
+        - ducklake
+      secrets:
+        - type: quack
+          token: "{{ env_var('QUACK_TOKEN') }}"
+      attach:
+        - path: "ducklake:quack:{{ env_var('DBT_DUCKLAKE_QUACK_HOST') }}:{{ env_var('DBT_DUCKLAKE_QUACK_PORT', '9494') }}"
+          alias: warehouse
+          is_ducklake: true
+          options:
+            data_path: "{{ env_var('DBT_DUCKLAKE_DATA_PATH') }}"
+            meta_disable_ssl: true
+      filesystems:
+        - fs: gcs
+          access: read_write
+          token: google_default
+          cache_timeout: 0
+        - fs: s3
+          anon: false
+          key: "{{ env_var('AWS_ACCESS_KEY', '') }}"
+          secret: "{{ env_var('AWS_SECRET_ACCESS_KEY', '') }}"
+
+  target: dev
