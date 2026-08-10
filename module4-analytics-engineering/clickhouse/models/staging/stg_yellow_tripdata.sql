@@ -41,8 +41,8 @@ qualify
     row_number() over(partition by VendorID, tpep_pickup_datetime) = 1
 
 -- Run as:
---  dbt build --select stg_yellow_tripdata --vars 'is_test_run: true'
---  dbt run --select stg_yellow_tripdata --vars 'is_test_run: false'
+--  dbt build --select stg_yellow_tripdata
+--  dbt build --select stg_yellow_tripdata --vars 'is_test_run: true'  # For testing
 {% if var('is_test_run', default=false) %}
 limit 100
 {% endif %}

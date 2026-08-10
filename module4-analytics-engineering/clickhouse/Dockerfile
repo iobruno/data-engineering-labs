@@ -35,6 +35,6 @@ ENV DBT_CLICKHOUSE_USER=
 ENV DBT_CLICKHOUSE_PASSWORD=
 
 ## Federated Queries
-ENV DBT_CLICKHOUSE_FQ_PGDATA_SCHEMA=
+ENV DBT_CLICKHOUSE_FQDN_NYC_TAXI=
 
 ENTRYPOINT ["sh", "-c", "dbt deps && dbt build --target prod && cp target/run_results.json target/run_results_backup.json && dbt docs generate --target prod && cp target/run_results_backup.json target/run_results.json"]
