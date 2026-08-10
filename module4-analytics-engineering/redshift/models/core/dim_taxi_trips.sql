@@ -51,6 +51,7 @@ select
     tt.congestion_surcharge                     as congestion_surcharge,
     tt.payment_type                             as payment_type,
     tt.payment_type_desc                        as payment_type_description
+-- inner join intentionally drops trips referencing an 'Unknown' or unmapped location_id
 from
     taxi_trips tt
 inner join

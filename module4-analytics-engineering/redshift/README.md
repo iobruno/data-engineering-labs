@@ -40,7 +40,7 @@ mkdir -p ~/.dbt/
 cat profiles.tmpl.yml >> ~/.dbt/profiles.yml
 ```
 
-3.2. Set the environment variables for `dbt-bigquery`:
+3.2. Set the environment variables for `dbt-redshift`:
 ```shell
 export DBT_REDSHIFT_HOST=redshift.[id].[region].redshift-serverless.amazonaws.com
 export DBT_REDSHIFT_DATABASE=dev
