@@ -1,8 +1,8 @@
-x-clickhouse-image: &clickhouse-image clickhouse/clickhouse-server:${CLICKHOUSE_VERSION:-24-alpine}
-x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-17-alpine}
+x-clickhouse-image: &clickhouse-image clickhouse:${CLICKHOUSE_VERSION:-26.1-jammy}
+x-postgres-image: &postgres-image postgres:${POSTGRES_VERSION:-18.1-alpine}
 
 services:
-  ingest-db:
+  postgres:
     image: *postgres-image
     container_name: ingest-db
     environment:
@@ -12,7 +12,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - vol-ingest-db:/var/lib/postgresql/data
+      - vol-tlc-db:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -46,8 +46,8 @@ services:
     restart: on-failure
 
 volumes:
-  vol-ingest-db:
-    name: vol-ingest-db
+  vol-tlc-db:
+    name: vol-tlc-db
   vol-clickhouse-data:
     name: vol-clickhouse-data
   vol-clickhouse-logs:
