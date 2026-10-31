@@ -1,6 +1,6 @@
 # Python ingestion with polars and pandas
 
-![Python](https://img.shields.io/badge/Python-3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
+![Python](https://img.shields.io/badge/Python-3.15_|_3.14_|_3.13_|_3.12-4B8BBE.svg?style=flat&logo=python&logoColor=FFD43B&labelColor=306998)
 [![Typer](https://img.shields.io/badge/Typer-262A38?style=flat&logo=typer&logoColor=FFFFFF&labelColor=262A38)](https://typer.tiangolo.com/tutorial/)
 [![Polars](https://img.shields.io/badge/polars-24292E?style=flat&logo=polars&logoColor=CC792B&labelColor=24292E)](https://docs.pola.rs/)
 [![Pandas](https://img.shields.io/badge/pandas-150458?style=flat&logo=pandas&logoColor=E70488&labelColor=150458)](https://pandas.pydata.org/docs/user_guide/)

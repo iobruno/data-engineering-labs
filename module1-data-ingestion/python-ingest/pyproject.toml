@@ -4,28 +4,28 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nyc-tlc-cli"
-version = "2.2"
+version = "2.3"
 description = "Headless CLI for processing the NYC TLC Dataset"
 readme = "README.md"
-requires-python = ">=3.12,<3.15"
+requires-python = ">=3.12,<3.16"
 
 dependencies = [
-    "typer>=0.23.1,<1.0",
-    "polars>=1.38.1,<2.0",
-    "pandas>=3.0.0,<4.0",
-    "pyarrow>=23.0.0,<24.0",
-    "adbc-driver-postgresql>=1.10.0,<2.0",
-    "adbc-driver-manager>=1.10.0,<2.0",
-    "psycopg[binary]>=3.3.2,<4.0",
-    "sqlalchemy>=2.0.46,<3.0",
-    "python-box[yaml]>=7.3.2,<8.0",
+    "typer>=0.27.3,<1.0",
+    "polars>=2.1.0,<3.0",
+    "pandas>=3.1.0,<4.0",
+    "pyarrow>=26.0.0,<27.0",
+    "adbc-driver-postgresql>=1.13.0,<2.0",
+    "adbc-driver-manager>=1.13.0,<2.0",
+    "psycopg[binary]>=3.3.6,<4.0",
+    "sqlalchemy>=2.1.6,<3.0",
+    "python-box[yaml]>=7.4.1,<8.0",
     "loguru>=0.7.3,<1.0",
 ]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15",
-    "jupyterlab>=4.5.4",
+    "ruff>=0.17",
+    "jupyterlab>=4.6.5",
 ]
 
 [project.scripts]
