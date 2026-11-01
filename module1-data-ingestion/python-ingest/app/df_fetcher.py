@@ -21,12 +21,18 @@ class DataframeFetcher(metaclass=ABCMeta):
 
 
 class PolarsFetcher(DataframeFetcher):
-    def fetch_csv(self, endpoint: str, schema: type[Schema] = None) -> pl.DataFrame:
-        schema_dict = schema.polars() if schema else None
-        return pl.read_csv(endpoint, schema_overrides=schema_dict)
-
     def fetch_parquet(self, endpoint: str) -> pl.DataFrame:
         return pl.read_parquet(endpoint)
+
+    def fetch_csv(self, endpoint: str, schema: type[Schema] | None = None) -> pl.DataFrame:
+        if not schema:
+            return pl.read_csv(endpoint)
+
+        return pl.read_csv(
+            endpoint,
+            new_columns=schema.cols(),
+            schema_overrides=schema.to_polars(),
+        )
 
     def slice_in_chunks(self, df, chunk_size: int = 100_000) -> list[pl.DataFrame]:
         return [
@@ -36,14 +42,23 @@ class PolarsFetcher(DataframeFetcher):
 
 
 class PandasFetcher(DataframeFetcher):
-    def fetch_csv(self, endpoint: str, schema: type[Schema] = None) -> pd.DataFrame:
-        schema_dict = schema.pyarrow() if schema else None
-        return pd.read_csv(endpoint, engine="pyarrow", dtype=schema_dict)
-
     def fetch_parquet(self, endpoint: str) -> pd.DataFrame:
         return pd.read_parquet(endpoint)
 
+    def fetch_csv(self, endpoint: str, schema: type[Schema] | None = None) -> pd.DataFrame:
+        if not schema:
+            return pd.read_csv(endpoint, engine="pyarrow")
+
+        return pd.read_csv(
+            endpoint,
+            engine="pyarrow",
+            header=0,
+            names=schema.cols(),
+            dtype=schema.to_arrow(),
+        )
+
     def slice_in_chunks(self, df, chunk_size: int = 100_000) -> list[pd.DataFrame]:
         return [
-            df.iloc[chunk_id : chunk_id + chunk_size] for chunk_id in range(0, len(df), chunk_size)
+            df.iloc[chunk_id : chunk_id + chunk_size]
+            for chunk_id in range(0, len(df), chunk_size)
         ]
