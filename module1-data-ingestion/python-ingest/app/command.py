@@ -71,25 +71,16 @@ def ingest_db(
     logger.info("Loading datasets...")
     datasets = load_conf()
 
+    jobs = [
+        (green, GreenTaxiProcessor, datasets.green_taxi_trip_data),
+        (yellow, YellowTaxiProcessor, datasets.yellow_taxi_trip_data),
+        (fhv, FhvProcessor, datasets.fhv_trip_data),
+        (zones, ZoneLookupProcessor, datasets.zone_lookups),
+    ]
+
     with progress:
-        if green:
-            endpoints = datasets.green_taxi_trip_data
-            processor = GreenTaxiProcessor(fetcher, conn_str)
-            processor.run(endpoints)
-
-        if yellow:
-            endpoints = datasets.yellow_taxi_trip_data
-            processor = YellowTaxiProcessor(fetcher, conn_str)
-            processor.run(endpoints)
-
-        if fhv:
-            endpoints = datasets.fhv_trip_data
-            processor = FhvProcessor(fetcher, conn_str)
-            processor.run(endpoints)
-
-        if zones:
-            endpoints = datasets.zone_lookups
-            processor = ZoneLookupProcessor(fetcher, conn_str)
-            processor.run(endpoints)
+        for enabled, processor_cls, endpoints in jobs:
+            if enabled:
+                processor_cls(fetcher, conn_str).run(endpoints)
 
     logger.info("All done!")

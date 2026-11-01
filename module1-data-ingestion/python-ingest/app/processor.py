@@ -1,11 +1,11 @@
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import Literal
+from typing import ClassVar, Literal
 
 from rich.progress import BarColumn, Progress, TaskID, TextColumn, TimeElapsedColumn
 
-from app.df_fetcher import DataframeFetcher
-from app.df_repository import FhvRepo, GreenTaxiRepo, SQLRepo, YellowTaxiRepo, ZoneLookupRepo
+from app.df_fetcher import DataframeFetcher, PolarsFetcher
+from app.df_repository import DataFrameRepo
 from app.schemas import FhvSchema, GreenTaxiSchema, Schema, YellowTaxiSchema, ZoneLookupSchema
 
 progress = Progress(
@@ -18,9 +18,18 @@ progress = Progress(
 
 
 class Processor(metaclass=ABCMeta):
-    def __init__(self, fetcher: DataframeFetcher, conn_str: str):
-        self.repo = self.repo(conn_str)
-        self.fetcher = fetcher
+
+    @abstractmethod
+    def schema(self) -> Schema:
+        raise NotImplementedError
+
+    @abstractmethod
+    def fetcher(self) -> DataframeFetcher:
+        raise NotImplementedError
+
+    @abstractmethod
+    def repo(self) -> DataFrameRepo:
+        raise NotImplementedError
 
     def extract_and_load_with(
         self,
@@ -34,7 +43,7 @@ class Processor(metaclass=ABCMeta):
         tid, *remain_tasks = tasks
         endpoint, *remain_endpoints = endpoints
 
-        df = self.fetcher.fetch_csv(endpoint, schema=self.schema())
+        df = self.fetcher.fetch_csv(endpoint, schema=self.schema)
         slices = self.fetcher.slice_in_chunks(df)
         chunk, *remain_chunks = slices
         completeness, total_parts = 1, len(slices)
@@ -64,42 +73,31 @@ class Processor(metaclass=ABCMeta):
             for name in filenames
         ]
 
-    @abstractmethod
-    def schema(self) -> Schema:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def repo(self, conn_str: str) -> SQLRepo:
-        raise NotImplementedError()
-
 
 class GreenTaxiProcessor(Processor):
-    def schema(self) -> type[GreenTaxiSchema]:
-        return GreenTaxiSchema
 
-    def repo(self, conn_str: str) -> SQLRepo:
-        return GreenTaxiRepo(conn_str)
+    def fetcher(self) -> DataframeFetcher:
+        return PolarsFetcher()
+
+    def schema(self):
+        return GreenTaxiSchema.to_polars()
+
+    def repo(self):
+        return GreenTaxiRepo()
+
+
 
 
 class YellowTaxiProcessor(Processor):
-    def schema(self) -> type[Schema]:
-        return YellowTaxiSchema
-
-    def repo(self, conn_str: str) -> SQLRepo:
-        return YellowTaxiRepo(conn_str)
+    schema = YellowTaxiSchema
+    repo_cls = YellowTaxiRepo
 
 
 class FhvProcessor(Processor):
-    def schema(self) -> type[Schema]:
-        return FhvSchema
-
-    def repo(self, conn_str) -> SQLRepo:
-        return FhvRepo(conn_str)
+    schema = FhvSchema
+    repo_cls = FhvRepo
 
 
 class ZoneLookupProcessor(Processor):
-    def schema(self) -> type[Schema]:
-        return ZoneLookupSchema
-
-    def repo(self, conn_str) -> SQLRepo:
-        return ZoneLookupRepo(conn_str)
+    schema = ZoneLookupSchema
+    repo_cls = ZoneLookupRepo
