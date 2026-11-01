@@ -64,3 +64,4 @@ split-on-trailing-comma = false
 
 [tool.ruff.lint.per-file-ignores]
 "*.ipynb" = ["E402"]  # allow imports not at top in notebooks
+"app/schemas.py" = ["RUF012"]  # Schema.fields are declarative class-level lists, never mutated
